@@ -29,7 +29,7 @@ interface BookingDetails {
 const CancelReservation = () => {
     const { ticketId, reservationToken } = useParams<{ ticketId: string, reservationToken: string }>();
     const navigate = useNavigate();
-    const [bookingDetails, setBookingDetails] = useState<BookingDetails | null>(null);
+    const [bookingDetails, _setBookingDetails] = useState<BookingDetails | null>(null);
 
     // Load booking details from storage
     useEffect(() => {

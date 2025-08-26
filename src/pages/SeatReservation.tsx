@@ -15,7 +15,7 @@ import { BookingService, type ReservationPayload } from '@/services/bookingServi
 import { useNavigate } from 'react-router-dom';
 
 const SeatReservationPage = () => {
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(2);
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedSeats, setSelectedSeats] = useState<any[]>([]);
 
@@ -65,33 +65,6 @@ const SeatReservationPage = () => {
       toast.error(error.message || 'Reservation failed. Please try again.');
     },
   });
-
-  // Generate valid future dates (Monday-Friday only)
-  const generateValidDates = () => {
-    const dates = [];
-    const today = new Date();
-
-    for (let i = 1; i <= 30; i++) {
-      const date = new Date(today);
-      date.setDate(today.getDate() + i);
-
-      if (date.getDay() >= 1 && date.getDay() <= 5) {
-        dates.push({
-          value: date.toISOString().split('T')[0],
-          label: date.toLocaleDateString('en-US', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-          })
-        });
-      }
-    }
-
-    return dates;
-  };
-
-  const validDates = generateValidDates();
 
   // Reset selected seats when date changes
   useEffect(() => {
@@ -157,13 +130,12 @@ const SeatReservationPage = () => {
                 <DateSelector
                   selectedDate={selectedDate}
                   onDateChange={setSelectedDate}
-                  validDates={validDates}
+                  validDates={[]} // Empty array since date picker handles validation internally
                 />
 
                 {selectedDate && (
                   <>
                     <Card>
-
                       <CardHeader>
                         <div className="flex items-center justify-between mb-4">
                           <h2 className="text-xl font-bold">Select your seat</h2>
@@ -205,7 +177,7 @@ const SeatReservationPage = () => {
               <ReservationForm
                 selectedDate={selectedDate}
                 selectedSeats={selectedSeats}
-                validDates={validDates}
+                validDates={[]} // Empty array since not needed for form
                 onSubmit={handleFormSubmit}
                 isSubmitting={reservationMutation.isPending}
               />

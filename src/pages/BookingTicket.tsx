@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Logo from "@/assets/tmas-logo-black.png";
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import type { OTPVerificationResponse } from '@/services/bookingService';
 import { toast } from 'sonner';
 import { ROUTES } from '@/config/route';
@@ -211,7 +211,7 @@ const BookingTicket = () => {
                     {/* Header with Logo */}
                     <div className="text-center mb-8">
                         <div className="inline-flex items-center justify-center mb-6">
-                            <img src={Logo} alt="TMAS Logo" className="w-36 sm:w-[145.131591796875px]" />
+                            <Link to={'/'}><img src={Logo} alt="TMAS Logo" className="w-36 sm:w-[145.131591796875px]" /></Link>
                         </div>
 
 

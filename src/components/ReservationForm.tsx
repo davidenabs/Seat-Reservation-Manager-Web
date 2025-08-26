@@ -5,8 +5,11 @@ import {
   FormField,
   FormItem,
   FormMessage,
+  FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -43,11 +46,26 @@ const ReservationForm = ({
       phone: "",
       gender: undefined,
       ageRange: undefined,
+      aboutYourself: "",
+      agreeToTerms: false,
     },
   });
 
   const handleSubmit = (data: ReservationFormData) => {
     onSubmit(data);
+  };
+
+  // Format selected date for display
+  const formatSelectedDate = (dateString: string) => {
+    if (!dateString) return "";
+    
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
   };
 
   return (
@@ -58,21 +76,20 @@ const ReservationForm = ({
           <CardTitle className="text-[24px]">Ticket Summary</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
-          <p className="flex justify-between"><span>Date:</span> {validDates.find(d => d.value === selectedDate)?.label}</p>
+          <p className="flex justify-between"><span>Date:</span> {formatSelectedDate(selectedDate)}</p>
           <p className="flex justify-between"><span>Time:</span> 4:00PM</p>
           <p className="flex justify-between"><span>Selected Seats:</span> {selectedSeats.map(s => s.label).join(', ')}</p>
         </CardContent>
       </Card>
-      <Card className="border-0  shadow-none">
+      
+      <Card className="border-0 shadow-none">
         <CardHeader>
           <CardTitle className="text-[24px]">Register</CardTitle>
         </CardHeader>
         <CardContent>
-
-
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Full Name */}
                 <FormField
                   control={form.control}
@@ -110,7 +127,7 @@ const ReservationForm = ({
                 />
               </div>
 
-             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Email */}
                 <FormField
                   control={form.control}
@@ -140,7 +157,6 @@ const ReservationForm = ({
                 />
               </div>
 
-
               {/* Age Range */}
               <FormField
                 control={form.control}
@@ -166,10 +182,53 @@ const ReservationForm = ({
                 )}
               />
 
+              {/* About Yourself */}
+              <FormField
+                control={form.control}
+                name="aboutYourself"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="Tell us something interesting about yourself (optional)"
+                        className="min-h-[100px] resize-none"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Terms and Conditions */}
+              <FormField
+                control={form.control}
+                name="agreeToTerms"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel className="text-sm font-normal cursor-pointer">
+                        By clicking submit, you agree to the{" "}
+                        <span className="text-[#FD690C] underline hover:no-underline">
+                          terms and conditions
+                        </span>
+                      </FormLabel>
+                      <FormMessage />
+                    </div>
+                  </FormItem>
+                )}
+              />
+
               <Button
                 type="submit"
                 className="w-full h-[48px] rounded-full"
-                disabled={isSubmitting}
+                disabled={isSubmitting || !form.watch('agreeToTerms')}
               >
                 <Ticket fill="" />
                 {isSubmitting ? 'Processing...' : 'Reserve Seat'}

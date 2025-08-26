@@ -40,7 +40,7 @@ const VerifyEmail = () => {
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [reservationToken, setReservationToken] = useState("");
-    const [resendMessage, setResendMessage] = useState("");
+    const [_resendMessage, setResendMessage] = useState("");
     const [countdown, setCountdown] = useState(0); // seconds remaining
 
 

@@ -17,7 +17,7 @@ class ApiClient {
   constructor(baseURL: string) {
     this.client = axios.create({
       baseURL,
-      timeout: 30000, // 30 seconds timeout
+      timeout: 60000, // 60 seconds timeout
       headers: {
         'Content-Type': 'application/json',
       },
@@ -235,6 +235,6 @@ class ApiClient {
 }
 
 // Create and export the API client instance
-const apiClient = new ApiClient('http://localhost:3003/api');
+const apiClient = new ApiClient('https://seat-reservation-system-api.onrender.com/api');
 
 export default apiClient;
