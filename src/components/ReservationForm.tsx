@@ -34,7 +34,6 @@ interface ReservationFormProps {
 const ReservationForm = ({
   selectedDate,
   selectedSeats,
-  validDates,
   onSubmit,
   isSubmitting
 }: ReservationFormProps) => {

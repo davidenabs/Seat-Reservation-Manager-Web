@@ -16,7 +16,7 @@ interface DateSelectorProps {
   validDates: Array<{ value: string; label: string }>;
 }
 
-const DateSelector = ({ selectedDate, onDateChange, validDates }: DateSelectorProps) => {
+const DateSelector = ({ selectedDate, onDateChange }: DateSelectorProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   // Convert selected date string to Date object for calendar
