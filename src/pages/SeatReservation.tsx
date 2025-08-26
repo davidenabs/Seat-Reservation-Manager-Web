@@ -15,7 +15,7 @@ import { BookingService, type ReservationPayload } from '@/services/bookingServi
 import { useNavigate } from 'react-router-dom';
 
 const SeatReservationPage = () => {
-  const [currentStep, setCurrentStep] = useState(2);
+  const [currentStep, setCurrentStep] = useState(1);
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedSeats, setSelectedSeats] = useState<any[]>([]);
 
