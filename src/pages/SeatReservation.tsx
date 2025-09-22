@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { BookingService, type ReservationPayload } from '@/services/bookingService';
 import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '@/config/route';
 
 const SeatReservationPage = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -54,11 +55,14 @@ const SeatReservationPage = () => {
         queryClient.invalidateQueries({ queryKey: ['seats'] });
         toast.success(data.message || 'Reservation successful!');
 
+        // storge booking in the booking_details
+        localStorage.setItem("booking_details", JSON.stringify(data));
+
         // Reset form and go to success page
         setCurrentStep(1);
         setSelectedSeats([]);
         setSelectedDate('');
-        // navigate(ROUTES.BOOKING_SUCCESS);
+        navigate(ROUTES.BOOKING_SUCCESS);
       }
     },
     onError: (error) => {

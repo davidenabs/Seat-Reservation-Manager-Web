@@ -1,3 +1,4 @@
+import config from '@/config/environment';
 import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios';
 import { toast } from 'sonner';
 
@@ -235,6 +236,7 @@ class ApiClient {
 }
 
 // Create and export the API client instance
-const apiClient = new ApiClient('https://seat-reservation-system-api.onrender.com/api');
+const baseUrl = config.app.devMode ? 'http://localhost:3003/api' : 'https://seat-reservation-system-api.onrender.com/api';
+const apiClient = new ApiClient(baseUrl);
 
 export default apiClient;
