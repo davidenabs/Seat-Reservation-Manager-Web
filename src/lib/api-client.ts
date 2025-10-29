@@ -236,7 +236,7 @@ class ApiClient {
 }
 
 // Create and export the API client instance
-const baseUrl = config.app.devMode ? 'http://localhost:3003/api' : 'https://seat-reservation-system-api.onrender.com/api';
+const baseUrl = config.app.devMode ? 'http://localhost:3003/api' : 'https://api.themorayobrownshow.com/api';
 const apiClient = new ApiClient(baseUrl);
 
 export default apiClient;
