@@ -44,8 +44,8 @@ const DateSelector = ({ selectedDate, onDateChange }: DateSelectorProps) => {
 
   const handleDateSelect = (date: Date | undefined) => {
     if (date) {
-      const dateString = date.toISOString().split('T')[0];
-      onDateChange(dateString);
+      // const dateString = date.toISOString().split('T')[0];
+      onDateChange(date.toDateString());
       setIsOpen(false);
     }
   };
