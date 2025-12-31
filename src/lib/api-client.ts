@@ -139,14 +139,14 @@ class ApiClient {
       return data.errors.join(', ');
     }
 
-    // Handle case where there's a single error field
-    if (data.error && typeof data.error === 'string') {
-      return data.error;
-    }
-
     // Handle case where there's a message field
     if (data.message && typeof data.message === 'string') {
       return data.message;
+    }
+
+    // Handle case where there's a single error field
+    if (data.error && typeof data.error === 'string') {
+      return data.error;
     }
 
     // Handle case where error is an object with a message
