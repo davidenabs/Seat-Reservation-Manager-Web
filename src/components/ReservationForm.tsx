@@ -214,9 +214,9 @@ const ReservationForm = ({
                     <div className="space-y-1 leading-none">
                       <FormLabel className="text-sm font-normal cursor-pointer">
                         By clicking submit, you agree to the{" "}
-                        <span className="text-[#FD690C] underline hover:no-underline">
+                        <a href="https://themorayoshow.com/about/" className="text-[#FD690C] underline hover:no-underline">
                           terms and conditions
-                        </span>
+                        </a>
                       </FormLabel>
                       <FormMessage />
                     </div>

@@ -15,15 +15,17 @@ const Header = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-8">
-            <img src={Logo} alt="TMAS Logo" className="w-36 sm:w-[145.131591796875px]" />
+            <a href="https://themorayoshow.com" target="_blank" rel="noopener noreferrer">
+              <img src={Logo} alt="TMAS Logo" className="w-36 sm:w-[145.131591796875px]" />
+            </a>
           </div>
           
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-8">
-            <a href="#" className="text-gray-700 hover:text-gray-900 font-medium">Home</a>
-            <a href="#" className="text-gray-700 hover:text-gray-900 font-medium">About the Show</a>
-            <a href="#" className="text-gray-700 hover:text-gray-900 font-medium">Prizes</a>
-            <a href="#" className="text-gray-700 hover:text-gray-900 font-medium">Contact</a>
+            <a href="https://themorayoshow.com" className="text-gray-700 hover:text-gray-900 font-medium">Home</a>
+            <a href="https://themorayoshow.com/meet-morayo/" className="text-gray-700 hover:text-gray-900 font-medium">Meet Morayo</a>
+            <a href="https://themorayoshow.com/join-us/" className="text-gray-700 hover:text-gray-900 font-medium">Join Us</a>
+            <a href="https://themorayoshow.com/contact" className="text-gray-700 hover:text-gray-900 font-medium">Contact</a>
           </nav>
 
           {/* Mobile Menu Button */}

@@ -8,28 +8,13 @@ import Logo from "@/assets/tmas-logo-black.png";
 import { BookingService } from "@/services/bookingService";
 import { toast } from "sonner";
 import { ROUTES } from "@/config/route";
+import type { BookingDetails } from "@/intefaces/booking";
 
-interface BookingDetails {
-    session: string;
-    date: string;
-    time: string;
-    seat: string;
-    location: string;
-    bookingId: string;
-}
-
-// const BookingService = {
-//   cancelReservation: async (ticketId: string) => {
-//     // Simulated API call (replace with actual API call)
-//     await new Promise((resolve) => setTimeout(resolve, 1000));
-//     return { success: true };
-//   },
-// };
 
 const CancelReservation = () => {
     const { ticketId, reservationToken } = useParams<{ ticketId: string, reservationToken: string }>();
     const navigate = useNavigate();
-    const [bookingDetails, _setBookingDetails] = useState<BookingDetails | null>(null);
+    const [bookingDetails] = useState<BookingDetails | null>(null);
 
     // Load booking details from storage
     useEffect(() => {
@@ -129,8 +114,8 @@ const CancelReservation = () => {
                 <div className="text-center mt-8">
                     <p className="text-gray-500 text-sm">
                         Contact support at{" "}
-                        <a href="mailto:support@company.com" className="text-blue-800 hover:underline font-medium">
-                            support@company.com
+                        <a href="mailto:info@mabstudios.com" className="text-blue-800 hover:underline font-medium">
+                            info@mabstudios.com
                         </a>{" "}
                         for any queries
                     </p>

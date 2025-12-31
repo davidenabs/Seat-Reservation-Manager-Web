@@ -1,15 +1,7 @@
 import config from '@/config/environment';
 import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios';
 import { toast } from 'sonner';
-
-// API Response interface
-interface ApiResponse<T = any> {
-  success: boolean;
-  data?: T;
-  message?: string;
-  error?: string;
-  errors?: string[]; // For validation errors array
-}
+import type { IAPIResponse } from '@/intefaces/api';
 
 // API Client class
 class ApiClient {
@@ -55,7 +47,7 @@ class ApiClient {
 
     // Response interceptor
     this.client.interceptors.response.use(
-      (response: AxiosResponse<ApiResponse>) => {
+      (response: AxiosResponse<IAPIResponse>) => {
         // Log response in development
         if (process.env.NODE_ENV === 'development') {
           console.log(`✅ API Response: ${response.config.method?.toUpperCase()} ${response.config.url}`, {
@@ -167,7 +159,7 @@ class ApiClient {
   }
 
   // Generic method to handle API responses and extract errors
-  private handleApiResponse<T>(response: AxiosResponse<ApiResponse<T>>): ApiResponse<T> {
+  private handleApiResponse<T>(response: AxiosResponse<IAPIResponse<T>>): IAPIResponse<T> {
     const { data } = response;
     
     if (!data.success) {
@@ -183,32 +175,32 @@ class ApiClient {
   }
 
   // Generic GET method
-  async get<T = any>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
-    const response = await this.client.get<ApiResponse<T>>(url, config);
+  async get<T = any>(url: string, config?: AxiosRequestConfig): Promise<IAPIResponse<T>> {
+    const response = await this.client.get<IAPIResponse<T>>(url, config);
     return this.handleApiResponse(response);
   }
 
   // Generic POST method
-  async post<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
-    const response = await this.client.post<ApiResponse<T>>(url, data, config);
+  async post<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<IAPIResponse<T>> {
+    const response = await this.client.post<IAPIResponse<T>>(url, data, config);
     return this.handleApiResponse(response);
   }
 
   // Generic PUT method
-  async put<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
-    const response = await this.client.put<ApiResponse<T>>(url, data, config);
+  async put<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<IAPIResponse<T>> {
+    const response = await this.client.put<IAPIResponse<T>>(url, data, config);
     return this.handleApiResponse(response);
   }
 
   // Generic PATCH method
-  async patch<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
-    const response = await this.client.patch<ApiResponse<T>>(url, data, config);
+  async patch<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<IAPIResponse<T>> {
+    const response = await this.client.patch<IAPIResponse<T>>(url, data, config);
     return this.handleApiResponse(response);
   }
 
   // Generic DELETE method
-  async delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
-    const response = await this.client.delete<ApiResponse<T>>(url, config);
+  async delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<IAPIResponse<T>> {
+    const response = await this.client.delete<IAPIResponse<T>>(url, config);
     return this.handleApiResponse(response);
   }
 
@@ -236,7 +228,7 @@ class ApiClient {
 }
 
 // Create and export the API client instance
-const baseUrl = config.app.devMode ? 'http://localhost:3003/api' : 'https://api.themorayobrownshow.com/api';
+const baseUrl = config.app.devMode ? 'http://localhost:3103/api' : 'https://api.themorayobrownshow.com/api';
 const apiClient = new ApiClient(baseUrl);
 
 export default apiClient;

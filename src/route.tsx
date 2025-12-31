@@ -1,31 +1,7 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import { ROUTES } from "@/config/route";
-import { type CustomRouteObject } from "@/types/route.type";
 import NotFoundPage from "@/pages/NotFoundPage";
-import SeatReservationPage from "@/pages/SeatReservation";
-import RouteWrapper from "@/components/RouteWrapper";
-import BookingTicket from "@/pages/BookingTicket";
-import VerifyEmail from "@/pages/VerifyEmail";
-import CancelReservation from "@/pages/CancelReservation";
-
-export const reservationRoutes: CustomRouteObject[] = [
-    {
-        path: ROUTES.HOME,
-        element: <SeatReservationPage />,
-    },
-    {
-        path: ROUTES.BOOKING_SUCCESS,
-        element: <BookingTicket />,
-    },
-    {
-        path: ROUTES.VERIFY,
-        element: <VerifyEmail />,
-    },
-    {
-        path: ROUTES.CANCEL,
-        element: <CancelReservation />,
-    }
-];
+import { reservationRoutes } from "./lib/route";
+import RouteWrapper from "./components/RouteWrapper";
 
 const AppRoutes = () => {
     return (

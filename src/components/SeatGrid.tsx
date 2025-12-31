@@ -1,21 +1,5 @@
 import { Button } from "@/components/ui/button";
-import type { SeatsResponse } from "@/services/bookingService";
-
-interface Seat {
-  number: number;
-  label: string;
-  isAvailable: boolean;
-}
-
-interface SeatGridProps {
-  seats: Seat[];
-  selectedSeats: Seat[];
-  onSeatClick: (seat: Seat) => void;
-  isLoading: boolean;
-  error: Error | null;
-  onRetry: () => void;
-  seatsData: SeatsResponse |undefined;
-}
+import type { ISeat, ISeatGridProps } from "@/intefaces/seats";
 
 const SeatGrid = ({
   seats,
@@ -24,9 +8,10 @@ const SeatGrid = ({
   isLoading,
   error,
   onRetry,
-  seatsData
-}: SeatGridProps) => {
-  const getSeatClass = (seat: Seat) => {
+  seatsData,  
+  settings
+}: ISeatGridProps) => {
+  const getSeatClass = (seat: ISeat) => {
     const baseClass = "w-8 h-8 text-xs font-medium rounded-sm transition-colors flex items-center justify-center border";
 
     if (!seat.isAvailable) {
@@ -119,9 +104,9 @@ const SeatGrid = ({
 
       {/* Selection Info */}
       <div className="text-center mb-4 text-sm text-gray-600">
-        {selectedSeats.length === 0 && "Select up to 2 seats"}
-        {selectedSeats.length === 1 && "You can select 1 more seat"}
-        {selectedSeats.length === 2 && "Maximum seats selected"}
+        {selectedSeats.length === 0 && `Select up to ${settings?.maxSeatsPerUser} seats`}
+        {selectedSeats.length === 1 && settings?.maxSeatsPerUser !== undefined && `You can select ${settings.maxSeatsPerUser - selectedSeats.length} more seat${settings.maxSeatsPerUser - selectedSeats.length === 1 ? "" : "s"}`}
+        {selectedSeats.length === settings?.maxSeatsPerUser && "Maximum seats selected"}
       </div>
     </div>
   );

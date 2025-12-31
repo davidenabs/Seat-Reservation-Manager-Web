@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Lock, ChevronLeft } from "lucide-react";
 import { toast } from "sonner";
 import Logo from "@/assets/tmas-logo-black.png";
-import { BookingService, type OTPVerificationPayload, type OTPResendPayload } from "@/services/bookingService";
+import { VerificationService } from "@/services/verificationService";
 import { ROUTES } from "@/config/route";
 
 import {
@@ -25,6 +25,7 @@ import {
     FormItem,
     FormMessage,
 } from "@/components/ui/form"
+import type { IOTPResendPayload, IOTPVerificationPayload } from "@/intefaces/verification";
 
 const otpSchema = z.object({
     otp: z
@@ -40,11 +41,9 @@ const VerifyEmail = () => {
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [reservationToken, setReservationToken] = useState("");
-    const [_resendMessage, setResendMessage] = useState("");
     const [countdown, setCountdown] = useState(0); // seconds remaining
 
-
-
+    // eslint-disable-next-line no-empty-pattern
     const {
         // register,
         // handleSubmit,
@@ -91,7 +90,7 @@ const VerifyEmail = () => {
 
     // OTP Verification Mutation
     const verifyOTPMutation = useMutation({
-        mutationFn: (payload: OTPVerificationPayload) => BookingService.verifyOTP(payload),
+        mutationFn: (payload: IOTPVerificationPayload) => VerificationService.verifyOTP(payload),
         onSuccess: (response) => {
             toast.success(response.message || "Email verified successfully!");
             console.log({ response });
@@ -115,14 +114,11 @@ const VerifyEmail = () => {
 
     // Resend OTP Mutation
     const resendOTPMutation = useMutation({
-        mutationFn: (payload: OTPResendPayload) => BookingService.resendOTP(payload),
+        mutationFn: (payload: IOTPResendPayload) => VerificationService.resendOTP(payload),
         onSuccess: (response) => {
             setCountdown(60); // start 1 min countdown
 
             toast.success(response.message || "A new OTP has been sent to your email.");
-            setResendMessage("A new OTP has been sent to your email.");
-            setTimeout(() => setResendMessage(""), 5000);
-
             // Clear current OTP input
         },
         onError: (error: Error) => {
@@ -139,7 +135,7 @@ const VerifyEmail = () => {
             return;
         }
 
-        const payload: OTPVerificationPayload = {
+        const payload: IOTPVerificationPayload = {
             email,
             otp: data.otp,
             tempId,
@@ -155,7 +151,7 @@ const VerifyEmail = () => {
             return;
         }
 
-        const payload: OTPResendPayload = {
+        const payload: IOTPResendPayload = {
             email,
         };
 
@@ -269,8 +265,8 @@ const VerifyEmail = () => {
                 <div className="text-center mt-8">
                     <p className="text-gray-500 text-sm">
                         Contact support at{" "}
-                        <a href="mailto:support@company.com" className="text-blue-800 hover:underline font-medium">
-                            support@company.com
+                        <a href="mailto:info@mabstudios.com" className="text-blue-800 hover:underline font-medium">
+                            info@mabstudios.com
                         </a>{" "}
                         for any queries
                     </p>

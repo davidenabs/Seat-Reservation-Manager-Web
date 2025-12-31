@@ -5,19 +5,16 @@ import { Badge } from '@/components/ui/badge';
 import Logo from "@/assets/tmas-logo-black.png";
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import type { OTPVerificationResponse } from '@/services/bookingService';
 import { toast } from 'sonner';
 import { ROUTES } from '@/config/route';
 import { formatDate } from '@/utils/formatDate';
 import { capitalizeFirstWord } from '@/utils/string';
+import type { IOTPVerificationResponse } from '@/intefaces/verification';
 
-const bookingData = {
+const defaultData = {
     session: "The Nigerian Family Space",
-    date: "Thursday, July 18, 2023",
     time: "4:00 PM - 6:00 PM",
-    seat: "46C",
     location: "Conference Hall A",
-    bookingId: "#BK-2023-001234"
 }
 
 // For PDF generation - these would normally be imported from npm packages
@@ -31,7 +28,7 @@ declare global {
 const BookingTicket = () => {
 
     const navigate = useNavigate();
-    const [bookingDetails, setBookingDetails] = useState<OTPVerificationResponse | null>(null);
+    const [bookingDetails, setBookingDetails] = useState<IOTPVerificationResponse | null>(null);
     const ticketRef = useRef<HTMLDivElement>(null);
     const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
@@ -43,7 +40,7 @@ const BookingTicket = () => {
         if (bookingDetailsString) {
             try {
                 // Parse the JSON string into an OTPVerificationResponse object
-                const parsedDetails = JSON.parse(bookingDetailsString) as OTPVerificationResponse;
+                const parsedDetails = JSON.parse(bookingDetailsString) as IOTPVerificationResponse;
                 setBookingDetails(parsedDetails);
             } catch (error) {
                 console.error("Failed to parse booking details:", error);
@@ -182,26 +179,7 @@ const BookingTicket = () => {
     };
 
     const handleAddToCalendar = () => {
-        // const eventDate = new Date(bookingDetails?.eventDate!); // Base date
-
-        // // Start time
-        // const startDate = new Date(eventDate);
-        // startDate.setHours(16, 0, 0, 0); // 4:00 PM
-
-        // // End time
-        // const endDate = new Date(eventDate);
-        // endDate.setHours(18, 0, 0, 0); // 6:00 PM
-
-        // const event = {
-        //     title: `THE MORAYO BROWN SHOW - Seat ${bookingDetails?.seatLabels}`,
-        //     start: startDate.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z',
-        //     end: endDate.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z',
-        //     description: `Booking ID: ${bookingDetails?.ticketId}\nLocation: Conference Hall A`,
-        //     location: "Conference Hall A"
-        // };
-
-        // const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.title)}&dates=${event.start}/${event.end}&details=${encodeURIComponent(event.description)}&location=${encodeURIComponent(event.location)}`;
-        window.open(bookingDetails?.calendarLink! ?? "#", '_blank');
+        window.open(bookingDetails?.calendarLink ?? "#", '_blank');
     };
 
     return (
@@ -211,7 +189,7 @@ const BookingTicket = () => {
                     {/* Header with Logo */}
                     <div className="text-center mb-8">
                         <div className="inline-flex items-center justify-center mb-6">
-                            <Link to={'/'}><img src={Logo} alt="TMAS Logo" className="w-36 sm:w-[145.131591796875px]" /></Link>
+                            <Link to={'https://themorayoshow.com'}><img src={Logo} alt="TMAS Logo" className="w-36 sm:w-[145.131591796875px]" /></Link>
                         </div>
 
 
@@ -239,22 +217,22 @@ const BookingTicket = () => {
                                         <div className="space-y-2">
                                             <div className="flex justify-between items-center py-1 border-gray-100">
                                                 <span className="text-gray-600 font-medium">Session</span>
-                                                <span className="text-gray-600">{bookingData.session}</span>
+                                                <span className="text-gray-600">{defaultData.session}</span>
                                             </div>
 
                                             <div className="flex justify-between items-center py-1 border-gray-100">
                                                 <span className="text-gray-600 font-medium">Date</span>
-                                                <span className="text-gray-600">{formatDate(bookingDetails?.eventDate!)}</span>
+                                                <span className="text-gray-600">{bookingDetails?.eventDate ? formatDate(bookingDetails.eventDate) : '—'}</span>
                                             </div>
 
                                             <div className="flex justify-between items-center py-1 border-gray-100">
                                                 <span className="text-gray-600 font-medium">Time</span>
-                                                <span className="text-gray-600">{bookingData.time}</span>
+                                                <span className="text-gray-600">{defaultData.time}</span>
                                             </div>
 
                                             <div className="flex justify-between items-center py-1 border-gray-100">
                                                 <span className="text-gray-600 font-medium">Status</span>
-                                                <span className="text-gray-600">{capitalizeFirstWord(bookingDetails?.status!)}</span>
+                                                <span className="text-gray-600">{bookingDetails?.status ? capitalizeFirstWord(bookingDetails.status) : '—'}</span>
                                             </div>
 
                                             <div className="flex justify-between items-center py-1 border-gray-100">
@@ -266,7 +244,7 @@ const BookingTicket = () => {
 
                                             <div className="flex justify-between items-center py-1 border-gray-100">
                                                 <span className="text-gray-600 font-medium">Location</span>
-                                                <span className="text-gray-600">{bookingData.location}</span>
+                                                <span className="text-gray-600">{defaultData.location}</span>
                                             </div>
 
                                             <div className="flex justify-between items-center py-1">
@@ -340,10 +318,10 @@ const BookingTicket = () => {
                                             <span>
                                                 Contact at {'  '}
                                                 <a
-                                                    href="mailto:support@company.com"
+                                                    href="mailto:info@mabstudios.com"
                                                     className="text-blue-800 hover:underline font-medium"
                                                 >
-                                                    support@company.com
+                                                    info@mabstudios.com
                                                 </a>
                                                 {' '}for any queries
                                             </span>

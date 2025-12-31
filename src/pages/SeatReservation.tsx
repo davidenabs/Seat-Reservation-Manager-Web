@@ -11,14 +11,17 @@ import TheaterPreview from '@/components/TheaterPreview';
 import type { ReservationFormData } from '@/schemas/reservationSchema';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { BookingService, type ReservationPayload } from '@/services/bookingService';
+import { BookingService } from '@/services/bookingService';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/config/route';
+import { SettingsService } from '@/services/settingsService';
+import type { IReservationPayload } from '@/intefaces/reservation';
+import type { ISeat } from '@/intefaces/seats';
 
 const SeatReservationPage = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedDate, setSelectedDate] = useState('');
-  const [selectedSeats, setSelectedSeats] = useState<any[]>([]);
+  const [selectedSeats, setSelectedSeats] = useState<ISeat[]>([]);
 
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -37,9 +40,22 @@ const SeatReservationPage = () => {
     gcTime: 300000,
   });
 
+  // Query for fetching settings
+  const {
+    data: settings,
+    isLoading: isLoadingSettings,
+    error: settingsError,
+    refetch: refetchSettings
+  } = useQuery({
+    queryKey: ['settings'],
+    queryFn: () => SettingsService.getSettings(),
+    staleTime: 30000,
+    gcTime: 300000,
+  });
+
   // Mutation for reserving seats
   const reservationMutation = useMutation({
-    mutationFn: (payload: ReservationPayload) => BookingService.reserveSeat(payload),
+    mutationFn: (payload: IReservationPayload) => BookingService.reserveSeat(payload),
     onSuccess: (data) => {
       const tempId = data.tempId;
       const reservationToken = data.reservationToken;
@@ -75,12 +91,12 @@ const SeatReservationPage = () => {
     setSelectedSeats([]);
   }, [selectedDate]);
 
-  const handleSeatClick = (seat: { isAvailable: any; number: any; }) => {
+  const handleSeatClick = (seat: ISeat) => {
     if (!seat.isAvailable) return;
 
-    if (selectedSeats.find((s: { number: any; }) => s.number === seat.number)) {
-      setSelectedSeats(selectedSeats.filter((s: { number: any; }) => s.number !== seat.number));
-    } else if (selectedSeats.length < 2) {
+    if (selectedSeats.find((s: ISeat) => s.number === seat.number)) {
+      setSelectedSeats(selectedSeats.filter((s: ISeat) => s.number !== seat.number));
+    } else if (selectedSeats.length < (settings?.maxSeatsPerUser ?? 2)) {
       setSelectedSeats([...selectedSeats, seat]);
     }
   };
@@ -91,10 +107,14 @@ const SeatReservationPage = () => {
   };
 
   const handleFormSubmit = (formData: ReservationFormData) => {
+    const localDate = new Date(selectedDate);
+    localDate.setMinutes(localDate.getMinutes() - localDate.getTimezoneOffset());
+    // console.log({ selectedDate: localDate.toISOString() });
+    // return;
     const payload = {
-      eventDate: new Date(selectedDate).toISOString(),
-      seatNumbers: selectedSeats.map((s: { number: any; }) => s.number),
-      seatLabels: selectedSeats.map((s: { label: any; }) => s.label),
+      eventDate: localDate.toISOString(),
+      seatNumbers: selectedSeats.map((s: ISeat) => s.number),
+      seatLabels: selectedSeats.map((s: ISeat) => s.label),
       ...formData
     };
 
@@ -134,7 +154,10 @@ const SeatReservationPage = () => {
                 <DateSelector
                   selectedDate={selectedDate}
                   onDateChange={setSelectedDate}
-                  validDates={[]} // Empty array since date picker handles validation internally
+                  isLoading={isLoadingSettings}
+                  error={settingsError}
+                  onRetry={refetchSettings}
+                  settings={settings!}
                 />
 
                 {selectedDate && (
@@ -155,10 +178,11 @@ const SeatReservationPage = () => {
                           seats={seatsData?.allSeats || []}
                           selectedSeats={selectedSeats}
                           onSeatClick={handleSeatClick}
-                          isLoading={isLoadingSeats}
-                          error={seatsError}
+                          isLoading={isLoadingSeats|| isLoadingSettings}
+                          error={seatsError|| settingsError}
                           onRetry={refetchSeats}
                           seatsData={seatsData}
+                          settings={settings!}
                         />
 
                         <Button
