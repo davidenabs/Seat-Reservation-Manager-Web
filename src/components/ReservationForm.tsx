@@ -76,7 +76,7 @@ const ReservationForm = ({
         </CardHeader>
         <CardContent className="space-y-2">
           <p className="flex justify-between"><span>Date:</span> {formatSelectedDate(selectedDate)}</p>
-          <p className="flex justify-between"><span>Time:</span> 4:00PM</p>
+          <p className="flex justify-between"><span>Arrival:</span> 9:00AM</p>
           <p className="flex justify-between"><span>Selected Seats:</span> {selectedSeats.map(s => s.label).join(', ')}</p>
         </CardContent>
       </Card>

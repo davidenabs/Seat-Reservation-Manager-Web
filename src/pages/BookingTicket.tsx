@@ -11,9 +11,9 @@ import { formatDate } from '@/utils/formatDate';
 import type { IOTPVerificationResponse } from '@/intefaces/verification';
 
 const defaultData = {
-    // session: "The Nigerian Family Space",
+    // session: "The Morayo Show",
     // time: "4:00 PM - 6:00 PM",
-    // location: "Conference Hall A",
+    // location: "MAB Studios",
     audienceBreakfast: "9AM",
     briefing: "10AM",
     liveShow: "11AM",
@@ -312,33 +312,33 @@ const BookingTicket = () => {
                                         <h3 className="font-medium text-[#000000]">Important Information</h3>
                                     </div>
 
-                                    <ul className="space-y-3 text-sm text-[#1D4ED8]">
+                                    <ul className="space-y-3 text-sm text-[#000000]">
                                         <li className="flex items-start">
-                                            <span className="w-1.5 h-1.5 bg-[#1D4ED8] rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                                            <span className="w-1.5 h-1.5 bg-[#000000] rounded-full mt-2 mr-3 flex-shrink-0"></span>
                                             Please arrive 30 minutes before the session starts
                                         </li>
                                         <li className="flex items-start">
-                                            <span className="w-1.5 h-1.5 bg-[#1D4ED8] rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                                            <span className="w-1.5 h-1.5 bg-[#000000] rounded-full mt-2 mr-3 flex-shrink-0"></span>
                                             Bring a valid ID for verification
                                         </li>
                                         <li className="flex items-start font-bold">
-                                            <span className="w-1.5 h-1.5 bg-[#1D4ED8] rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                                            <span className="w-1.5 h-1.5 bg-[#000000] rounded-full mt-2 mr-3 flex-shrink-0"></span>
                                            Dress Code: Elegant
                                         </li>
                                         <li className="flex items-start">
-                                            <span className="w-1.5 h-1.5 bg-[#1D4ED8] rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                                            <span className="w-1.5 h-1.5 bg-[#000000] rounded-full mt-2 mr-3 flex-shrink-0"></span>
                                             <span>
                                                 Contact support at{' '}
                                                 <a
                                                     href="mailto:info@mabstudios.org"
-                                                    className="text-blue-800 hover:underline font-medium"
+                                                    className="text-[#000000] hover:underline font-medium"
                                                 >
                                                     info@mabstudios.org
                                                 </a>
                                                 {' '}or call{' '}
                                                 <a
                                                     href="tel:09048331499"
-                                                    className="text-blue-800 hover:underline font-medium"
+                                                    className="text-[#000000] hover:underline font-medium"
                                                 >
                                                     09048331499
                                                 </a>
