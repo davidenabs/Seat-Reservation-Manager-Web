@@ -8,13 +8,15 @@ import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { ROUTES } from '@/config/route';
 import { formatDate } from '@/utils/formatDate';
-import { capitalizeFirstWord } from '@/utils/string';
 import type { IOTPVerificationResponse } from '@/intefaces/verification';
 
 const defaultData = {
-    session: "The Nigerian Family Space",
-    time: "4:00 PM - 6:00 PM",
-    location: "Conference Hall A",
+    // session: "The Nigerian Family Space",
+    // time: "4:00 PM - 6:00 PM",
+    // location: "Conference Hall A",
+    audienceBreakfast: "9AM",
+    briefing: "10AM",
+    liveShow: "11AM",
 }
 
 // For PDF generation - these would normally be imported from npm packages
@@ -215,10 +217,10 @@ const BookingTicket = () => {
                                         <h2 className="text-xl font-bold text-gray-800 mb-6">Session Summary</h2>
 
                                         <div className="space-y-2">
-                                            <div className="flex justify-between items-center py-1 border-gray-100">
+                                            {/* <div className="flex justify-between items-center py-1 border-gray-100">
                                                 <span className="text-gray-600 font-medium">Session</span>
                                                 <span className="text-gray-600">{defaultData.session}</span>
-                                            </div>
+                                            </div> */}
 
                                             <div className="flex justify-between items-center py-1 border-gray-100">
                                                 <span className="text-gray-600 font-medium">Date</span>
@@ -226,14 +228,24 @@ const BookingTicket = () => {
                                             </div>
 
                                             <div className="flex justify-between items-center py-1 border-gray-100">
-                                                <span className="text-gray-600 font-medium">Time</span>
-                                                <span className="text-gray-600">{defaultData.time}</span>
+                                                <span className="text-gray-600 font-medium">Audience Breakfast</span>
+                                                <span className="text-gray-600">{defaultData.audienceBreakfast}</span>
                                             </div>
 
                                             <div className="flex justify-between items-center py-1 border-gray-100">
+                                                <span className="text-gray-600 font-medium">Briefing</span>
+                                                <span className="text-gray-600">{defaultData.briefing}</span>
+                                            </div>
+
+                                            <div className="flex justify-between items-center py-1 border-gray-100">
+                                                <span className="text-gray-600 font-medium">Live Show</span>
+                                                <span className="text-gray-600">{defaultData.liveShow}</span>
+                                            </div>
+
+                                            {/* <div className="flex justify-between items-center py-1 border-gray-100">
                                                 <span className="text-gray-600 font-medium">Status</span>
                                                 <span className="text-gray-600">{bookingDetails?.status ? capitalizeFirstWord(bookingDetails.status) : '—'}</span>
-                                            </div>
+                                            </div> */}
 
                                             <div className="flex justify-between items-center py-1 border-gray-100">
                                                 <span className="text-gray-600 font-medium">Seat</span>
@@ -242,10 +254,10 @@ const BookingTicket = () => {
                                                 </Badge>
                                             </div>
 
-                                            <div className="flex justify-between items-center py-1 border-gray-100">
+                                            {/* <div className="flex justify-between items-center py-1 border-gray-100">
                                                 <span className="text-gray-600 font-medium">Location</span>
                                                 <span className="text-gray-600">{defaultData.location}</span>
-                                            </div>
+                                            </div> */}
 
                                             <div className="flex justify-between items-center py-1">
                                                 <span className="text-gray-600 font-medium">Booking ID</span>
@@ -293,35 +305,42 @@ const BookingTicket = () => {
                             </Card>
 
                             {/* Important Information */}
-                            <Card className="shadow-none border0 bg-blue-50 border-[#BFDBFE]">
+                            <Card className="shadow-none border0 bg-[#F18547] border-[#FFD6BE]">
                                 <CardContent className="p-6">
                                     <div className="flex items-center mb-4">
-                                        <Info fill='#1E40AF' stroke='white' className="w-4 h-4 text-[#1E40AF] mr-2" />
-                                        <h3 className="font-medium text-[#1E40AF]">Important Information</h3>
+                                        <Info fill='#000000' stroke='white' className="w-4 h-4 text-[#000000] mr-2" />
+                                        <h3 className="font-medium text-[#000000]">Important Information</h3>
                                     </div>
 
                                     <ul className="space-y-3 text-sm text-[#1D4ED8]">
                                         <li className="flex items-start">
                                             <span className="w-1.5 h-1.5 bg-[#1D4ED8] rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                                            Please arrive 15 minutes before the session starts
+                                            Please arrive 30 minutes before the session starts
                                         </li>
                                         <li className="flex items-start">
                                             <span className="w-1.5 h-1.5 bg-[#1D4ED8] rounded-full mt-2 mr-3 flex-shrink-0"></span>
                                             Bring a valid ID for verification
                                         </li>
-                                        <li className="flex items-start">
+                                        <li className="flex items-start font-bold">
                                             <span className="w-1.5 h-1.5 bg-[#1D4ED8] rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                                            Session materials will be provided
+                                           Dress Code: Elegant
                                         </li>
                                         <li className="flex items-start">
                                             <span className="w-1.5 h-1.5 bg-[#1D4ED8] rounded-full mt-2 mr-3 flex-shrink-0"></span>
                                             <span>
-                                                Contact at {'  '}
+                                                Contact support at{' '}
                                                 <a
-                                                    href="mailto:info@mabstudios.com"
+                                                    href="mailto:info@mabstudios.org"
                                                     className="text-blue-800 hover:underline font-medium"
                                                 >
-                                                    info@mabstudios.com
+                                                    info@mabstudios.org
+                                                </a>
+                                                {' '}or call{' '}
+                                                <a
+                                                    href="tel:09048331499"
+                                                    className="text-blue-800 hover:underline font-medium"
+                                                >
+                                                    09048331499
                                                 </a>
                                                 {' '}for any queries
                                             </span>
