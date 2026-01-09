@@ -79,6 +79,8 @@ const DateSelector = ({
   // - Only allow days of week that are present in workingDays array
   // - Don't allow past dates (before today)
   const isDateDisabled = (date: Date) => {
+    const normalizedDate = new Date(date);
+    normalizedDate.setHours(0, 0, 0, 0);
     // 1. Only enable between reservation window
     if (minDate && date < minDate) return true;
     if (maxDate && date > maxDate) return true;
@@ -91,6 +93,14 @@ const DateSelector = ({
     // 3. Only enable working days (0=Sunday, ..., 6=Saturday)
     const dayOfWeek = date.getDay();
     if (!workingDays.includes(dayOfWeek)) return true;
+
+    // 4. Manually disable January 22, 2026
+    const manuallyDisabledDates = ["2026-01-22"].map((d) => {
+      const date = new Date(d);
+      date.setHours(0, 0, 0, 0);
+      return date.getTime();
+    });
+    if (manuallyDisabledDates.includes(normalizedDate.getTime())) return true;
 
     return false;
   };
@@ -123,14 +133,10 @@ const DateSelector = ({
               )}
             >
               {error && !isLoading && (
-                <div className="text-red-500 text-sm mb-2">
-                  {error.message}
-                </div>
+                <div className="text-red-500 text-sm mb-2">{error.message}</div>
               )}
               <Calendar className="mr-2 h-4 w-4" />
-              {isLoading
-                ? "Loading…"
-                : formatSelectedDate(selectedDate)}
+              {isLoading ? "Loading…" : formatSelectedDate(selectedDate)}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
