@@ -315,6 +315,10 @@ const BookingTicket = () => {
                                     <ul className="space-y-3 text-sm text-[#000000]">
                                         <li className="flex items-start">
                                             <span className="w-1.5 h-1.5 bg-[#000000] rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                                            Arrival time 8AM
+                                        </li>
+                                        <li className="flex items-start">
+                                            <span className="w-1.5 h-1.5 bg-[#000000] rounded-full mt-2 mr-3 flex-shrink-0"></span>
                                             Please arrive 30 minutes before the session starts
                                         </li>
                                         <li className="flex items-start">
