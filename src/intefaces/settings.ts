@@ -5,4 +5,5 @@ export interface ISettings {
   eventTimes: string[];
   workingDays: string[];
   maxSeatsPerUser: number;
+  blockedDates: string[];
 }

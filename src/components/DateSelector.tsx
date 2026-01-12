@@ -95,11 +95,10 @@ const DateSelector = ({
     if (!workingDays.includes(dayOfWeek)) return true;
 
     // 4. Manually disable January 22, 2026
-    const manuallyDisabledDates = [
-      "2026-01-22",
-      "2026-01-15",
-      "2026-01-29"
-    ].map((d) => {
+    const blockedDates = settings?.blockedDates || [];
+    console.log({blockedDates});
+    
+    const manuallyDisabledDates = blockedDates.map((d) => {
       const date = new Date(d);
       date.setHours(0, 0, 0, 0);
       return date.getTime();
