@@ -21,7 +21,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ReservationFormSchema, type ReservationFormData } from "../schemas/reservationSchema";
-import { Ticket } from "lucide-react";
+import { Loader, Ticket } from "lucide-react";
 
 interface ReservationFormProps {
   selectedDate: string;
@@ -57,7 +57,7 @@ const ReservationForm = ({
   // Format selected date for display
   const formatSelectedDate = (dateString: string) => {
     if (!dateString) return "";
-    
+
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
       weekday: 'long',
@@ -80,7 +80,7 @@ const ReservationForm = ({
           <p className="flex justify-between"><span>Selected Seats:</span> {selectedSeats.map(s => s.label).join(', ')}</p>
         </CardContent>
       </Card>
-      
+
       <Card className="border-0 shadow-none">
         <CardHeader>
           <CardTitle className="text-[24px]">Register</CardTitle>
@@ -96,7 +96,7 @@ const ReservationForm = ({
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Input placeholder="Name" {...field} />
+                        <Input placeholder="Name" {...field} disabled={isSubmitting} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -108,9 +108,9 @@ const ReservationForm = ({
                   name="gender"
                   render={({ field }) => (
                     <FormItem>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value} disabled={isSubmitting}>
                         <FormControl>
-                          <SelectTrigger className="w-full">
+                          <SelectTrigger className="w-full" disabled={isSubmitting}>
                             <SelectValue placeholder="Gender" />
                           </SelectTrigger>
                         </FormControl>
@@ -134,7 +134,7 @@ const ReservationForm = ({
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Input type="email" placeholder="Your email" {...field} />
+                        <Input type="email" placeholder="Your email" {...field} disabled={isSubmitting} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -148,7 +148,7 @@ const ReservationForm = ({
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Input type="tel" placeholder="Phone number" {...field} />
+                        <Input type="tel" placeholder="Phone number" {...field} disabled={isSubmitting} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -162,9 +162,9 @@ const ReservationForm = ({
                 name="ageRange"
                 render={({ field }) => (
                   <FormItem>
-                    <Select onValueChange={field.onChange} value={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value} disabled={isSubmitting}>
                       <FormControl>
-                        <SelectTrigger className="w-full">
+                        <SelectTrigger className="w-full" disabled={isSubmitting}>
                           <SelectValue placeholder="Age Range" />
                         </SelectTrigger>
                       </FormControl>
@@ -188,10 +188,11 @@ const ReservationForm = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Textarea 
+                      <Textarea
                         placeholder="Tell us something interesting about yourself (optional)"
                         className="min-h-[100px] resize-none"
                         {...field}
+                        disabled={isSubmitting}
                       />
                     </FormControl>
                     <FormMessage />
@@ -209,6 +210,7 @@ const ReservationForm = ({
                       <Checkbox
                         checked={field.value}
                         onCheckedChange={field.onChange}
+                        disabled={isSubmitting}
                       />
                     </FormControl>
                     <div className="space-y-1 leading-none">
@@ -229,8 +231,11 @@ const ReservationForm = ({
                 className="w-full h-[48px] rounded-full"
                 disabled={isSubmitting || !form.watch('agreeToTerms')}
               >
-                <Ticket fill="" />
-                {isSubmitting ? 'Processing...' : 'Reserve Seat'}
+                {
+                  isSubmitting ?
+                    <Loader className="animate-spin" /> :
+                    <><Ticket fill="" />{" "}Reserve Seat</>
+                }
               </Button>
             </form>
           </Form>
