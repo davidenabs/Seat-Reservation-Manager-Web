@@ -58,11 +58,11 @@ const WaitingRoom = () => {
         const LAGOS_ZONE = 'Africa/Lagos';
         // Get the date part in Lagos context
         const datePart = DateTime.fromISO(currentEvent.date, { zone: LAGOS_ZONE }).toFormat('yyyy-MM-dd');
-        
+
         // Reconstruct start and end times in Lagos context
         const startDateTime = DateTime.fromISO(`${datePart}T${currentEvent.time}`, { zone: LAGOS_ZONE });
         const endDateTime = DateTime.fromISO(`${datePart}T${currentEvent.endTime}`, { zone: LAGOS_ZONE });
-        
+
         const now = DateTime.now();
         const diffStart = startDateTime.diff(now);
         const diffEnd = endDateTime.diff(now);
@@ -72,17 +72,17 @@ const WaitingRoom = () => {
           setIsLive(false);
           return;
         }
-        
+
         if (diffStart.milliseconds <= 0) {
           setTime({ h: 0, m: 0, s: 0 });
           setIsLive(true);
         } else {
           // Calculate remaining time for countdown
           const duration = diffStart.shiftTo('hours', 'minutes', 'seconds');
-          setTime({ 
-            h: Math.max(0, Math.floor(duration.hours)), 
-            m: Math.max(0, Math.floor(duration.minutes)), 
-            s: Math.max(0, Math.floor(duration.seconds)) 
+          setTime({
+            h: Math.max(0, Math.floor(duration.hours)),
+            m: Math.max(0, Math.floor(duration.minutes)),
+            s: Math.max(0, Math.floor(duration.seconds))
           });
           setIsLive(false);
         }
@@ -133,10 +133,10 @@ const WaitingRoom = () => {
       try {
         const meetingNumber = currentEvent.zoomMeetingId;
         const password = currentEvent.zoomPassword;
-        
+
         const signature = await SubscriptionService.getZoomSignature(meetingNumber, 0);
         const joinToken = await SubscriptionService.getJoinToken(meetingNumber);
-        
+
         const params = new URLSearchParams({
           mn: meetingNumber.toString(),
           pwd: password,
@@ -263,7 +263,7 @@ const WaitingRoom = () => {
         <div className="fixed inset-0 h-[100dvh] w-screen z-[9999] bg-black overflow-hidden">
           {/* Isolated Iframe Portal - Truly Full Screen */}
           {portalUrl ? (
-            <iframe 
+            <iframe
               src={portalUrl}
               className="absolute inset-0 w-full h-full border-none z-0"
               allow="camera; microphone; display-capture; autoplay; clipboard-write; encrypted-media; fullscreen"
@@ -286,20 +286,23 @@ const WaitingRoom = () => {
               </h2>
             </div>
             <button
-              onClick={() => setStreamActive(false)}
+              onClick={() => {
+                setStreamActive(false);
+                window.location.reload();
+              }}
               className="pointer-events-auto text-[11px] font-semibold tracking-[1px] uppercase py-2 px-5 rounded-full border border-white/20 text-white bg-white/10 hover:bg-[#E8593C] hover:border-[#E8593C] transition-all duration-300"
             >
               Exit Portal
             </button>
           </div>
-          
+
           {/* Security Banner - Floating Above Iframe */}
           <div className="absolute bottom-16 left-0 right-0 px-5 flex justify-center items-center pointer-events-none z-10">
             <div className="bg-black/60 backdrop-blur-md px-4 py-2 rounded-full border border-white/5 flex items-center gap-3">
               <span className="text-[9px] text-[#8E8E93] tracking-[1.5px] uppercase font-bold">Protected Stream</span>
               <div className="w-1 h-1 bg-white/20 rounded-full" />
               <span className="text-[10px] text-white/40 font-mono tracking-tight uppercase">{email}</span>
-s            </div>
+            </div>
           </div>
         </div>
       )}

@@ -61,7 +61,7 @@ const MemberDashboard = () => {
     const lagosDateTime = DateTime.fromISO(`${datePart}T${event.time}`, { zone: 'Africa/Lagos' });
     
     // Format for user's local timezone
-    return lagosDateTime.toLocaleString(DateTime.DATETIME_MED);
+    return lagosDateTime.setZone('local').toLocaleString(DateTime.DATETIME_MED);
   };
 
   const copyLink = () => {
