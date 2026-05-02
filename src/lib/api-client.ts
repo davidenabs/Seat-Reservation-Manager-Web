@@ -29,6 +29,12 @@ class ApiClient {
           config.headers.Authorization = `Bearer ${token}`;
         }
 
+        // Add user's timezone to headers
+        const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        if (userTimezone) {
+          config.headers['X-Timezone'] = userTimezone;
+        }
+
         // Log request in development
         if (process.env.NODE_ENV === 'development') {
           console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`, {

@@ -4,6 +4,7 @@ import { format } from "date-fns";
 import VirtualNavbar from "../components/VirtualNavbar";
 import { AuthService } from "../services/authService";
 import { SubscriptionService } from "../services/subscriptionService";
+import { DateTime } from "luxon";
 
 const WaitingRoom = () => {
   const [time, setTime] = useState({ h: 0, m: 12, s: 47 });
@@ -50,30 +51,39 @@ const WaitingRoom = () => {
     };
   }, [streamActive]);
 
+
   useEffect(() => {
     const timer = setInterval(() => {
       if (currentEvent && currentEvent.date && currentEvent.time && currentEvent.endTime) {
-        const datePart = currentEvent.date.split("T")[0];
-        const eventDate = new Date(`${datePart}T${currentEvent.time}:00`).getTime();
-        const eventEndDate = new Date(`${datePart}T${currentEvent.endTime}:00`).getTime();
-        const now = new Date().getTime();
-        const distance = eventDate - now;
-        const distanceEnd = eventEndDate - now;
+        const LAGOS_ZONE = 'Africa/Lagos';
+        // Get the date part in Lagos context
+        const datePart = DateTime.fromISO(currentEvent.date, { zone: LAGOS_ZONE }).toFormat('yyyy-MM-dd');
+        
+        // Reconstruct start and end times in Lagos context
+        const startDateTime = DateTime.fromISO(`${datePart}T${currentEvent.time}`, { zone: LAGOS_ZONE });
+        const endDateTime = DateTime.fromISO(`${datePart}T${currentEvent.endTime}`, { zone: LAGOS_ZONE });
+        
+        const now = DateTime.now();
+        const diffStart = startDateTime.diff(now);
+        const diffEnd = endDateTime.diff(now);
 
-        if (distanceEnd <= 0) {
+        if (diffEnd.milliseconds <= 0) {
           setTime({ h: 0, m: 0, s: 0 });
           setIsLive(false);
           return;
         }
         
-        if (distance <= 0) {
+        if (diffStart.milliseconds <= 0) {
           setTime({ h: 0, m: 0, s: 0 });
           setIsLive(true);
         } else {
-          const h = Math.floor(distance / (1000 * 60 * 60));
-          const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-          const s = Math.floor((distance % (1000 * 60)) / 1000);
-          setTime({ h, m, s });
+          // Calculate remaining time for countdown
+          const duration = diffStart.shiftTo('hours', 'minutes', 'seconds');
+          setTime({ 
+            h: Math.max(0, Math.floor(duration.hours)), 
+            m: Math.max(0, Math.floor(duration.minutes)), 
+            s: Math.max(0, Math.floor(duration.seconds)) 
+          });
           setIsLive(false);
         }
       } else {

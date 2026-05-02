@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-// import { toast } from "sonner";
-import { format } from "date-fns";
+import { toast } from "sonner";
+import { DateTime } from "luxon";
 import VirtualNavbar from "../components/VirtualNavbar";
 import { AuthService } from "../services/authService";
 import { SubscriptionService } from "../services/subscriptionService";
@@ -51,18 +51,31 @@ const MemberDashboard = () => {
     }
   };
 
-  // const copyLink = () => {
-  //   const url = subscription?.zoomJoinUrl || "N/A";
-  //   if (url === "N/A") {
-  //     toast.error("No Zoom URL available");
-  //     return;
-  //   }
-  //   navigator.clipboard.writeText(url).then(() => {
-  //     toast.success("Personal join link copied");
-  //   }).catch(() => {
-  //     toast.error("Failed to copy link");
-  //   });
-  // };
+  const formatEventTime = (event: any) => {
+    if (!event || !event.date || !event.time) return "Date & Time to be announced";
+    
+    // Parse the date part in Lagos context
+    const datePart = DateTime.fromISO(event.date, { zone: 'Africa/Lagos' }).toFormat('yyyy-MM-dd');
+    
+    // Create the full datetime in Lagos timezone
+    const lagosDateTime = DateTime.fromISO(`${datePart}T${event.time}`, { zone: 'Africa/Lagos' });
+    
+    // Format for user's local timezone
+    return lagosDateTime.toLocaleString(DateTime.DATETIME_MED);
+  };
+
+  const copyLink = () => {
+    const url = subscription?.zoomJoinUrl || "N/A";
+    if (url === "N/A") {
+      toast.error("No Zoom URL available");
+      return;
+    }
+    navigator.clipboard.writeText(url).then(() => {
+      toast.success("Personal join link copied");
+    }).catch(() => {
+      toast.error("Failed to copy link");
+    });
+  };
 
   if (loading) {
     return (
@@ -94,8 +107,14 @@ const MemberDashboard = () => {
             <div className="flex flex-col md:flex-row justify-between md:items-start gap-4 md:gap-0 mb-7 relative z-1">
               <div>
                 {(() => {
-                  const hasEnded = currentEvent?.endTime && currentEvent?.date && 
-                                   new Date().getTime() > new Date(`${currentEvent.date.split('T')[0]}T${currentEvent.endTime}:00`).getTime();
+                  const LAGOS_ZONE = 'Africa/Lagos';
+                  const now = DateTime.now().setZone(LAGOS_ZONE);
+                  const datePart = currentEvent?.date ? DateTime.fromISO(currentEvent.date, { zone: LAGOS_ZONE }).toFormat('yyyy-MM-dd') : null;
+                  const endDateTime = (currentEvent && datePart && currentEvent.endTime) 
+                    ? DateTime.fromISO(`${datePart}T${currentEvent.endTime}`, { zone: LAGOS_ZONE })
+                    : null;
+                  
+                  const hasEnded = endDateTime && now > endDateTime;
                   
                   return (
                     <div className={`inline-flex items-center gap-1.5 px-3 py-[5px] rounded-full mb-4 ${hasEnded ? 'bg-white/10' : 'bg-[#E8593C]/15'}`}>
@@ -110,7 +129,7 @@ const MemberDashboard = () => {
                   {currentEvent ? currentEvent.title : "TBA: Stay tuned for our next episode!"}
                 </h3>
                 <div className="text-[13px] text-[#8E8E93]">
-                  {currentEvent && currentEvent.date && currentEvent.time ? `${format(new Date(`${currentEvent.date.split('T')[0]}T${currentEvent.time}:00`), 'EEEE · h:mm a')} WAT` : "Date & Time to be announced"}
+                  {formatEventTime(currentEvent)}
                 </div>
               </div>
             </div>
@@ -123,21 +142,27 @@ const MemberDashboard = () => {
                 </div>
                 <div className="flex gap-2">
                   {(() => {
-                    const now = new Date().getTime();
-                    const datePart = currentEvent?.date?.split('T')[0];
-                    const startTime = currentEvent?.time ? new Date(`${datePart}T${currentEvent.time}:00`).getTime() : 0;
-                    const endTime = currentEvent?.endTime ? new Date(`${datePart}T${currentEvent.endTime}:00`).getTime() : 0;
-                    const isLiveNow = currentEvent && now >= startTime && now < endTime;
+                    const LAGOS_ZONE = 'Africa/Lagos';
+                    const now = DateTime.now().setZone(LAGOS_ZONE);
+                    const datePart = currentEvent?.date ? DateTime.fromISO(currentEvent.date, { zone: LAGOS_ZONE }).toFormat('yyyy-MM-dd') : null;
+                    const startDateTime = (currentEvent && datePart && currentEvent.time) 
+                      ? DateTime.fromISO(`${datePart}T${currentEvent.time}`, { zone: LAGOS_ZONE })
+                      : null;
+                    const endDateTime = (currentEvent && datePart && currentEvent.endTime) 
+                      ? DateTime.fromISO(`${datePart}T${currentEvent.endTime}`, { zone: LAGOS_ZONE })
+                      : null;
+
+                    const isLiveNow = currentEvent && startDateTime && endDateTime && now >= startDateTime && now < endDateTime;
 
                     return (
                       <>
-                        {/* <button
+                        <button
                           className={`text-[11px] px-3 py-1.5 rounded-[7px] cursor-pointer select-none text-[#E8593C] border border-[#E8593C]/40 bg-transparent hover:bg-[#E8593C]/10 transition ${!isLiveNow ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
                           onClick={copyLink}
                           disabled={!isLiveNow}
                         >
                           Copy
-                        </button> */}
+                        </button>
                         <button
                           className={`text-[11px] px-3 py-1.5 rounded-[7px] cursor-pointer select-none bg-[#E8593C] text-white border border-[#E8593C] hover:bg-[#D14920] transition ${!isLiveNow ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
                           onClick={() => navigate('/waiting')}
@@ -207,10 +232,10 @@ const MemberDashboard = () => {
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-[10px] flex flex-col items-center justify-center shrink-0 bg-[#E8593C]/10">
                       <div className="text-[9px] tracking-[0.5px] font-medium text-[#E8593C]">
-                        {format(new Date(event.date), 'MMM').toUpperCase()}
+                        {DateTime.fromISO(event.date).toFormat('MMM').toUpperCase()}
                       </div>
                       <div className="text-[18px] font-medium leading-none mt-[2px] text-[#E8593C]">
-                        {format(new Date(event.date), 'dd')}
+                        {DateTime.fromISO(event.date).toFormat('dd')}
                       </div>
                     </div>
                     <div>
@@ -218,7 +243,7 @@ const MemberDashboard = () => {
                         {event.title}
                       </div>
                       <div className="text-[12px] text-[#8E8E93]">
-                        {`${format(new Date(`${event.date.split('T')[0]}T${event.time}:00`), 'EEE · h:mm a')} WAT`} · {event.availableSeats || 0} seats
+                        {`${DateTime.fromISO(`${event.date.split('T')[0]}T${event.time}:00`).toFormat('EEE · h:mm a')} WAT`} · {event.availableSeats || 0} seats
                       </div>
                     </div>
                   </div>
