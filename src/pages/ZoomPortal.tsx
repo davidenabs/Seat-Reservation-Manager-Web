@@ -11,11 +11,14 @@ const ZoomPortal = () => {
     // 1. Force mobile-optimized viewport meta tag inside the portal
     let meta = document.querySelector('meta[name="viewport"]');
     if (!meta) {
-      meta = document.createElement('meta');
+      meta = document.createElement("meta");
       (meta as any).name = "viewport";
       document.head.appendChild(meta);
     }
-    meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0');
+    meta.setAttribute(
+      "content",
+      "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0",
+    );
 
     const meetingNumber = searchParams.get("mn");
     const password = searchParams.get("pwd");
@@ -34,8 +37,8 @@ const ZoomPortal = () => {
     const loadScript = (src: string, id: string) => {
       return new Promise((resolve, reject) => {
         if (document.getElementById(id)) {
-            resolve(true);
-            return;
+          resolve(true);
+          return;
         }
         const script = document.createElement("script");
         script.id = id;
@@ -50,10 +53,19 @@ const ZoomPortal = () => {
 
     const startZoom = async () => {
       try {
-        await loadScript("https://unpkg.com/react@18/umd/react.production.min.js", "react-global");
-        await loadScript("https://unpkg.com/react-dom@18/umd/react-dom.production.min.js", "react-dom-global");
-        await loadScript("https://source.zoom.us/3.13.2/zoom-meeting-embedded-3.13.2.min.js", "zoom-sdk-global");
-        
+        await loadScript(
+          "https://unpkg.com/react@18/umd/react.production.min.js",
+          "react-global",
+        );
+        await loadScript(
+          "https://unpkg.com/react-dom@18/umd/react-dom.production.min.js",
+          "react-dom-global",
+        );
+        await loadScript(
+          "https://source.zoom.us/3.13.2/zoom-meeting-embedded-3.13.2.min.js",
+          "zoom-sdk-global",
+        );
+
         const ZoomMtgEmbedded = (window as any).ZoomMtgEmbedded;
         if (!ZoomMtgEmbedded) return;
 
@@ -68,7 +80,10 @@ const ZoomPortal = () => {
             video: {
               isResizable: true,
               viewSizes: {
-                default: { width: window.innerWidth, height: window.innerHeight },
+                default: {
+                  // width: window.innerWidth,
+                  // height: window.innerHeight,
+                },
               },
             },
           },
@@ -88,7 +103,7 @@ const ZoomPortal = () => {
           if (zoomClient) {
             const { width, height } = entries[0].contentRect;
             zoomClient.updateViewSizes({
-              default: { width: Math.floor(width), height: Math.floor(height) }
+              default: { width: Math.floor(width), height: Math.floor(height) },
             });
           }
         });
@@ -112,10 +127,9 @@ const ZoomPortal = () => {
         }, 2000);
 
         return () => {
-           clearInterval(styleLoop);
-           resizeObserver.disconnect();
+          clearInterval(styleLoop);
+          resizeObserver.disconnect();
         };
-
       } catch (err) {
         console.error("Zoom Portal Error:", err);
       }
@@ -125,19 +139,24 @@ const ZoomPortal = () => {
     return () => {
       clearTimeout(timeout);
       if (zoomClient) {
-        try { zoomClient.leave(); } catch(e) {}
+        try {
+          zoomClient.leave();
+        } catch (e) {
+          console.log(e);
+          
+        }
       }
     };
   }, [searchParams]);
 
   return (
     <div className="w-screen h-screen bg-black overflow-hidden relative">
-      <div 
-        ref={zoomContainerRef} 
+      <div
+        ref={zoomContainerRef}
         id="zoom-portal-root"
         className="w-full h-full absolute inset-0"
       />
-      
+
       {/* Global CSS for the portal to ensure full-bleed rendering */}
       <style>{`
         body, html {
