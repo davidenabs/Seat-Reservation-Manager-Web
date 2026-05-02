@@ -3,7 +3,7 @@ import { ChevronLeft, Ticket } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import Header from "@/components/Header";
+import VirtualNavbar from "@/components/VirtualNavbar";
 import DateSelector from "@/components/DateSelector";
 import SeatGrid from "@/components/SeatGrid";
 import ReservationForm from "@/components/ReservationForm";
@@ -139,8 +139,8 @@ const SeatReservationPage = () => {
   const seatsData = seatsResponse;
 
   return (
-    <div className="min-h-screen bg-[#EDEDED]">
-      <Header />
+    <div className="min-h-screen bg-morayo-bg text-morayo-ink antialiased font-sans text-[14px] leading-[1.5] pt-[60px]">
+      <VirtualNavbar />
 
       <div className="max-w-7xl mx-auto p-8">
         <Button

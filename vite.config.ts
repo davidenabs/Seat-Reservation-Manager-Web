@@ -11,4 +11,12 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  optimizeDeps: {
+    exclude: ['@zoom/meetingsdk'],
+  },
+  build: {
+    rollupOptions: {
+      external: ['react', 'react-dom'],
+    },
+  },
 })

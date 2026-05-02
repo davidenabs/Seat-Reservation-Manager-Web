@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Morayo Show — Virtual Audience Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,500;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FAFAF7;
+    --surface: #FFFFFF;
+    --ink: #1a1a1a;
+    --ink-2: #3d3d3a;
+    --muted: #5F5E5A;
+    --muted-2: #888780;
+    --hairline: #E5E3DC;
+    --hairline-2: #F1EFE8;
+    --crimson: #8B1F2F;
+    --crimson-deep: #6B1623;
+    --coral: #E8593C;
+    --green: #1D9E75;
+    --green-bg: #E1F5EE;
+    --green-ink: #085041;
+    --amber: #EF9F27;
+    --amber-bg: #FAEEDA;
+    --amber-ink: #854F0B;
+    --blue: #378ADD;
+    --blue-bg: #E6F1FB;
+    --blue-ink: #0C447C;
+    --night: #0A0A0A;
+    --night-2: #1a1a1a;
+    --night-text: #FAFAF7;
+    --night-muted: #9C9A92;
+    --night-muted-2: #5F5E5A;
+    --night-line: rgba(255,255,255,0.06);
+    --night-card: rgba(255,255,255,0.04);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .serif { font-family: 'Fraunces', Georgia, serif; font-style: italic; font-weight: 400; }
+  .serif-roman { font-family: 'Fraunces', Georgia, serif; font-style: normal; font-weight: 400; }
+
+  .screen { display: none; min-height: 100vh; animation: fadeIn 0.3s ease; }
+  .screen.active { display: block; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .nav-bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    background: rgba(10,10,10,0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 0.5px solid rgba(255,255,255,0.08);
+    padding: 12px 32px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .nav-brand { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .nav-brand .logo { font-family: 'Fraunces', serif; font-style: italic; font-size: 22px; color: var(--coral); letter-spacing: -0.5px; }
+  .nav-brand .tag { color: #C9C9C4; font-size: 10px; letter-spacing: 2px; padding-top: 4px; }
+  .nav-pills { display: flex; gap: 4px; background: rgba(255,255,255,0.04); border: 0.5px solid rgba(255,255,255,0.08); border-radius: 999px; padding: 3px; }
+  .nav-pill {
+    padding: 7px 14px;
+    font-size: 12px;
+    color: #C9C9C4;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .nav-pill:hover { color: #FAFAF7; }
+  .nav-pill.active { background: var(--coral); color: #FFFFFF; }
+
+  .page { padding-top: 60px; }
+
+  /* ============ LANDING PAGE ============ */
+  .landing-hero {
+    background: var(--bg);
+    padding: 96px 32px 48px;
+    text-align: center;
+    position: relative;
+  }
+  .landing-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 14px;
+    background: rgba(232,89,60,0.08);
+    border: 0.5px solid rgba(232,89,60,0.2);
+    border-radius: 999px;
+    margin-bottom: 28px;
+  }
+  .landing-badge .dot { width: 6px; height: 6px; background: var(--coral); border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .landing-badge span:last-child { font-size: 12px; color: #993C1D; letter-spacing: 0.3px; }
+
+  .landing-h1 {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: 72px;
+    line-height: 1;
+    margin: 0 0 20px;
+    color: var(--ink);
+    letter-spacing: -2.5px;
+  }
+  .landing-h1 .accent { color: var(--coral); font-style: italic; }
+  .landing-sub {
+    font-size: 16px; color: var(--muted);
+    max-width: 460px; margin: 0 auto 48px;
+    line-height: 1.6;
+  }
+
+  .landing-pricing {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 0 32px 80px;
+  }
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .pricing-card {
+    background: var(--surface);
+    border: 0.5px solid var(--hairline);
+    border-radius: 18px;
+    padding: 32px 28px;
+    position: relative;
+    transition: all 0.25s ease;
+    cursor: pointer;
+  }
+  .pricing-card:hover {
+    border-color: var(--ink);
+    transform: translateY(-2px);
+  }
+  .pricing-card.featured {
+    border: 1.5px solid var(--crimson);
+  }
+  .pricing-card.featured:hover {
+    transform: translateY(-2px);
+  }
+  .featured-badge {
+    position: absolute; top: -11px; left: 50%; transform: translateX(-50%);
+    background: var(--crimson); color: #FFFFFF;
+    font-size: 10px; padding: 5px 12px; border-radius: 999px;
+    letter-spacing: 1.2px; font-weight: 500;
+  }
+  .pricing-tier {
+    font-size: 11px; color: var(--muted-2); letter-spacing: 1.8px;
+    margin-bottom: 18px; font-weight: 500;
+  }
+  .pricing-card.featured .pricing-tier { color: var(--crimson); }
+  .pricing-amount {
+    display: flex; align-items: baseline; gap: 4px; margin-bottom: 4px;
+  }
+  .pricing-amount .num {
+    font-family: 'Fraunces', serif; font-style: normal;
+    font-size: 44px; color: var(--ink); font-weight: 400;
+    letter-spacing: -2px; line-height: 1;
+  }
+  .pricing-amount .per { font-size: 13px; color: var(--muted-2); }
+  .pricing-naira {
+    font-size: 13px; color: var(--muted-2); margin-bottom: 24px;
+  }
+  .pricing-divider {
+    height: 0.5px; background: var(--hairline); margin: 20px 0;
+  }
+  .pricing-feat {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 13px; color: var(--ink-2);
+    margin-bottom: 12px;
+  }
+  .pricing-feat .dot { width: 4px; height: 4px; background: var(--muted-2); border-radius: 50%; }
+  .pricing-card.featured .pricing-feat .dot { background: var(--crimson); }
+  .pricing-cta {
+    margin-top: 28px;
+    padding: 12px;
+    text-align: center;
+    border: 0.5px solid var(--ink);
+    border-radius: 12px;
+    font-size: 13px;
+    color: var(--ink);
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .pricing-cta:hover { background: var(--ink); color: #FFFFFF; }
+  .pricing-cta.primary {
+    background: var(--crimson);
+    color: #FFFFFF;
+    border-color: var(--crimson);
+  }
+  .pricing-cta.primary:hover {
+    background: var(--crimson-deep);
+    border-color: var(--crimson-deep);
+  }
+
+  .landing-footer-note {
+    text-align: center; margin-top: 32px;
+    font-size: 12px; color: var(--muted-2);
+  }
+
+  /* ============ MEMBER DASHBOARD ============ */
+  .member-page {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 48px 32px 80px;
+  }
+  .greeting-block { margin-bottom: 32px; }
+  .greeting-eyebrow {
+    font-size: 12px; color: var(--muted-2);
+    letter-spacing: 0.3px; margin-bottom: 8px;
+  }
+  .greeting-h2 {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: 38px;
+    margin: 0; color: var(--ink);
+    letter-spacing: -1px;
+    line-height: 1.1;
+  }
+
+  .hero-card {
+    background: var(--night-2);
+    color: var(--night-text);
+    border-radius: 20px;
+    padding: 32px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-card::before {
+    content: '';
+    position: absolute; top: 0; right: 0;
+    width: 280px; height: 280px;
+    background: radial-gradient(circle, rgba(232,89,60,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-top {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 28px;
+    position: relative; z-index: 1;
+  }
+  .hero-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 12px;
+    background: rgba(232,89,60,0.15);
+    border-radius: 999px; margin-bottom: 16px;
+  }
+  .hero-pill .dot {
+    width: 5px; height: 5px; background: var(--coral); border-radius: 50%;
+    animation: pulse 1.5s infinite;
+  }
+  .hero-pill span:last-child {
+    font-size: 10px; color: var(--coral); letter-spacing: 1.2px; font-weight: 500;
+  }
+  .hero-title {
+    font-family: 'Fraunces', serif;
+    font-style: normal;
+    font-size: 24px; font-weight: 400;
+    margin: 0 0 8px;
+    letter-spacing: -0.5px;
+  }
+  .hero-meta { font-size: 13px; color: var(--night-muted); }
+  .hero-countdown { text-align: right; }
+  .hero-countdown .label { font-size: 11px; color: var(--night-muted); margin-bottom: 6px; }
+  .hero-countdown .time {
+    font-family: 'Fraunces', serif;
+    font-size: 30px;
+    font-weight: 400;
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+
+  .join-link-card {
+    background: var(--night-card);
+    border: 0.5px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    position: relative; z-index: 1;
+  }
+  .join-link-label {
+    font-size: 10px; color: var(--night-muted);
+    letter-spacing: 1.2px; margin-bottom: 8px;
+  }
+  .join-link-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .join-link-url {
+    font-family: 'SF Mono', Menlo, monospace;
+    font-size: 12px; color: #C9C9C4;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    flex: 1;
+  }
+  .join-link-actions { display: flex; gap: 8px; }
+  .join-btn {
+    font-size: 11px; padding: 6px 12px;
+    border-radius: 7px; cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .join-btn.copy {
+    color: var(--coral);
+    border: 0.5px solid rgba(232,89,60,0.4);
+  }
+  .join-btn.copy:hover { background: rgba(232,89,60,0.1); }
+  .join-btn.go {
+    background: var(--coral); color: #FFFFFF;
+    border: 0.5px solid var(--coral);
+  }
+  .join-btn.go:hover { background: #D14920; }
+
+  .hero-disclaimer {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 12px; color: var(--night-muted);
+    position: relative; z-index: 1;
+  }
+  .hero-disclaimer .info-icon {
+    width: 14px; height: 14px;
+    border: 0.5px solid var(--night-muted);
+    border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 9px; flex-shrink: 0;
+  }
+
+  .stats-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    margin-bottom: 32px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 0.5px solid var(--hairline);
+    border-radius: 14px;
+    padding: 18px;
+  }
+  .stat-card .label {
+    font-size: 11px; color: var(--muted-2);
+    letter-spacing: 0.5px; margin-bottom: 10px;
+  }
+  .stat-card .value {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 16px; color: var(--ink); font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .stat-card .value .dot { width: 7px; height: 7px; background: var(--green); border-radius: 50%; }
+  .stat-card .meta { font-size: 11px; color: var(--muted-2); }
+
+  .upcoming-section { }
+  .upcoming-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 16px;
+  }
+  .upcoming-title { font-size: 14px; color: var(--ink); font-weight: 500; }
+  .upcoming-link { font-size: 12px; color: var(--muted-2); cursor: pointer; }
+  .upcoming-link:hover { color: var(--ink); }
+
+  .show-row {
+    background: var(--surface);
+    border: 0.5px solid var(--hairline);
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-bottom: 10px;
+    display: flex; align-items: center; justify-content: space-between;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+  .show-row:hover {
+    border-color: var(--muted-2);
+    transform: translateX(2px);
+  }
+  .show-row-left { display: flex; align-items: center; gap: 16px; }
+  .date-block {
+    width: 48px; height: 48px;
+    border-radius: 10px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .date-block.featured { background: var(--amber-bg); }
+  .date-block.featured .m { color: var(--amber-ink); }
+  .date-block.featured .d { color: var(--amber-ink); }
+  .date-block.standard { background: var(--hairline-2); }
+  .date-block.standard .m { color: var(--muted); }
+  .date-block.standard .d { color: var(--ink); }
+  .date-block .m { font-size: 9px; letter-spacing: 0.5px; font-weight: 500; }
+  .date-block .d { font-size: 18px; font-weight: 500; line-height: 1; margin-top: 2px; }
+
+  .show-row-info .title { font-size: 14px; color: var(--ink); margin-bottom: 3px; }
+  .show-row-info .meta { font-size: 12px; color: var(--muted-2); }
+
+  .pill {
+    font-size: 11px; padding: 5px 11px;
+    border-radius: 999px;
+    display: inline-flex; align-items: center; gap: 6px;
+    white-space: nowrap;
+  }
+  .pill.success { background: var(--green-bg); color: var(--green-ink); }
+  .pill.neutral { background: var(--surface); color: var(--muted); border: 0.5px solid #D3D1C7; }
+  .pill.warning { background: var(--amber-bg); color: var(--amber-ink); }
+  .pill.info { background: var(--blue-bg); color: var(--blue-ink); }
+  .pill .dot { width: 5px; height: 5px; border-radius: 50%; }
+  .pill.success .dot { background: var(--green); }
+  .pill.warning .dot { background: var(--amber); }
+  .pill.info .dot { background: var(--blue); }
+
+  /* ============ WAITING ROOM ============ */
+  .waiting-room {
+    background: var(--night);
+    min-height: calc(100vh - 60px);
+    color: var(--night-text);
+    position: relative;
+    overflow: hidden;
+  }
+  .waiting-room::before {
+    content: '';
+    position: absolute;
+    top: -200px; left: 50%; transform: translateX(-50%);
+    width: 800px; height: 600px;
+    background: radial-gradient(ellipse, rgba(232,89,60,0.15) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .waiting-content {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 80px 32px 48px;
+    text-align: center;
+    position: relative; z-index: 1;
+  }
+  .waiting-eyebrow {
+    font-size: 11px; color: var(--night-muted);
+    letter-spacing: 2.5px; margin-bottom: 20px;
+  }
+  .waiting-title {
+    font-family: 'Fraunces', serif; font-style: italic;
+    font-size: 56px; font-weight: 300;
+    margin: 0 0 16px;
+    letter-spacing: -2px; line-height: 1;
+  }
+  .waiting-meta {
+    font-size: 14px; color: var(--night-muted);
+    margin: 0 0 56px;
+  }
+  .countdown-row {
+    display: flex; justify-content: center; gap: 14px;
+    margin-bottom: 56px;
+  }
+  .count-box {
+    background: var(--night-card);
+    border: 0.5px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 22px 28px;
+    min-width: 92px;
+  }
+  .count-box.live {
+    background: rgba(232,89,60,0.08);
+    border-color: rgba(232,89,60,0.4);
+  }
+  .count-num {
+    font-family: 'Fraunces', serif;
+    font-size: 40px; font-weight: 400;
+    letter-spacing: -2px; line-height: 1;
+  }
+  .count-box.live .count-num { color: var(--coral); }
+  .count-label {
+    font-size: 10px; letter-spacing: 1.5px;
+    color: var(--night-muted); margin-top: 8px;
+  }
+  .count-box.live .count-label { color: var(--coral); }
+
+  .enter-cta {
+    display: inline-block;
+    padding: 16px 44px;
+    background: var(--coral);
+    color: #FFFFFF;
+    border-radius: 999px;
+    font-size: 15px; font-weight: 500;
+    letter-spacing: 0.3px;
+    margin-bottom: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    font-family: inherit;
+  }
+  .enter-cta:hover {
+    background: #D14920;
+    transform: translateY(-1px);
+  }
+  .enter-cta:active { transform: translateY(0); }
+  .enter-meta {
+    font-size: 12px; color: var(--night-muted-2);
+  }
+
+  .waiting-footer {
+    border-top: 0.5px solid var(--night-line);
+    padding: 24px 32px;
+    display: flex; justify-content: space-around; align-items: center;
+    background: rgba(255,255,255,0.02);
+    max-width: 980px;
+    margin: 0 auto;
+  }
+  .wf-item { text-align: center; }
+  .wf-item .label {
+    font-size: 11px; color: var(--night-muted-2);
+    letter-spacing: 0.5px; margin-bottom: 6px;
+  }
+  .wf-item .value { font-size: 14px; color: #C9C9C4; }
+  .wf-divider { width: 0.5px; height: 36px; background: rgba(255,255,255,0.08); }
+  .wf-success { color: #5DCAA5; }
+
+  /* ============ ADMIN ============ */
+  .admin-shell {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    min-height: calc(100vh - 60px);
+  }
+  .admin-side {
+    background: var(--surface);
+    border-right: 0.5px solid var(--hairline);
+    padding: 32px 20px;
+  }
+  .admin-brand .logo {
+    font-family: 'Fraunces', serif; font-style: italic;
+    font-size: 24px; color: var(--coral); letter-spacing: -0.5px;
+  }
+  .admin-brand .role {
+    color: var(--muted-2); font-size: 10px; letter-spacing: 2px;
+  }
+  .side-section-label {
+    font-size: 10px; color: #B4B2A9;
+    letter-spacing: 1.5px; margin: 36px 0 12px;
+  }
+  .side-nav { display: flex; flex-direction: column; gap: 2px; }
+  .side-nav-item {
+    padding: 9px 12px;
+    font-size: 13px; color: var(--muted);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .side-nav-item:hover { background: var(--hairline-2); color: var(--ink); }
+  .side-nav-item.active {
+    color: #FFFFFF;
+    background: var(--crimson);
+  }
+  .side-nav-item.active:hover { background: var(--crimson-deep); }
+
+  .quick-stat-card {
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 14px;
+    margin-top: 10px;
+  }
+  .quick-stat-label { font-size: 10px; color: var(--muted-2); margin-bottom: 5px; }
+  .quick-stat-value { font-size: 20px; color: var(--ink); font-weight: 500; }
+  .quick-stat-trend { font-size: 10px; color: var(--green); margin-top: 4px; }
+
+  .admin-main { padding: 32px 36px; }
+  .admin-head {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 32px;
+  }
+  .admin-h1 {
+    margin: 0 0 6px;
+    font-size: 26px; color: var(--ink); font-weight: 500;
+    letter-spacing: -0.8px;
+  }
+  .admin-sub { margin: 0; font-size: 13px; color: var(--muted-2); }
+  .admin-actions { display: flex; gap: 10px; }
+  .admin-btn {
+    padding: 9px 16px;
+    border: 0.5px solid #D3D1C7;
+    border-radius: 9px;
+    font-size: 12px; color: var(--ink);
+    cursor: pointer;
+    background: var(--surface);
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .admin-btn:hover { border-color: var(--ink); }
+  .admin-btn.primary {
+    background: var(--ink); color: #FFFFFF; border-color: var(--ink);
+  }
+  .admin-btn.primary:hover { background: #000; }
+
+  .admin-time-toggle {
+    display: flex; gap: 4px;
+    padding: 4px; background: var(--surface);
+    border: 0.5px solid var(--hairline);
+    border-radius: 10px;
+  }
+  .admin-time-toggle .item {
+    padding: 6px 14px;
+    font-size: 11px; color: var(--muted);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .admin-time-toggle .item.active {
+    color: #FFFFFF; background: var(--ink);
+  }
+
+  .metric-row {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+    margin-bottom: 28px;
+  }
+  .metric-card {
+    background: var(--surface);
+    border: 0.5px solid var(--hairline);
+    border-radius: 12px;
+    padding: 18px;
+  }
+  .metric-card .label {
+    font-size: 11px; color: var(--muted-2);
+    letter-spacing: 0.5px; margin-bottom: 10px;
+  }
+  .metric-card .value {
+    font-size: 24px; color: var(--ink); font-weight: 500;
+    letter-spacing: -0.8px; line-height: 1;
+  }
+  .metric-card .trend {
+    font-size: 11px; margin-top: 8px;
+  }
+  .trend.up { color: var(--green); }
+  .trend.down { color: #A32D2D; }
+  .trend.flat { color: var(--muted-2); }
+  .progress-bar {
+    height: 4px; background: var(--hairline-2);
+    border-radius: 2px; margin-top: 8px;
+    overflow: hidden;
+  }
+  .progress-bar > div { height: 100%; background: var(--green); border-radius: 2px; }
+
+  .section-label {
+    font-size: 11px; color: var(--muted-2);
+    letter-spacing: 1.2px; margin: 32px 0 12px;
+  }
+
+  .shows-table {
+    background: var(--surface);
+    border: 0.5px solid var(--hairline);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .shows-row {
+    padding: 18px 22px;
+    display: grid;
+    grid-template-columns: 84px 1fr 120px 130px 90px;
+    gap: 18px;
+    align-items: center;
+    border-bottom: 0.5px solid var(--hairline);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .shows-row:last-child { border-bottom: none; }
+  .shows-row:hover { background: var(--bg); }
+  .shows-date {
+    border-radius: 10px; padding: 10px;
+    text-align: center;
+  }
+  .shows-date.featured { background: var(--amber-bg); }
+  .shows-date.featured .m, .shows-date.featured .t { color: var(--amber-ink); }
+  .shows-date.featured .d { color: #633806; }
+  .shows-date.standard { background: var(--hairline-2); }
+  .shows-date.standard .m, .shows-date.standard .t { color: var(--muted); }
+  .shows-date.standard .d { color: var(--ink); }
+  .shows-date .m { font-size: 9px; letter-spacing: 0.5px; }
+  .shows-date .d { font-size: 19px; font-weight: 500; line-height: 1; margin-top: 3px; }
+  .shows-date .t { font-size: 9px; margin-top: 5px; }
+
+  .shows-info .title { font-size: 14px; color: var(--ink); font-weight: 500; margin-bottom: 4px; }
+  .shows-info .meta { font-size: 12px; color: var(--muted-2); }
+
+  .shows-fill .top { font-size: 13px; color: var(--ink); }
+  .shows-fill .bot { font-size: 11px; color: var(--muted-2); }
+
+  .shows-action { font-size: 12px; color: var(--ink); text-align: right; }
+
+  /* ============ REVENUE DASHBOARD ============ */
+  .chart-card {
+    background: var(--surface);
+    border: 0.5px solid var(--hairline);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  .chart-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 20px;
+  }
+  .chart-title { font-size: 14px; color: var(--ink); font-weight: 500; }
+  .chart-sub { font-size: 12px; color: var(--muted-2); margin-top: 2px; }
+  .chart-legend { display: flex; gap: 16px; font-size: 12px; }
+  .chart-legend .item {
+    display: inline-flex; align-items: center; gap: 6px;
+    color: var(--muted);
+  }
+  .chart-legend .swatch { width: 10px; height: 10px; border-radius: 2px; }
+
+  .breakdown-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+  }
+  .breakdown-card {
+    background: var(--surface);
+    border: 0.5px solid var(--hairline);
+    border-radius: 14px;
+    padding: 22px;
+  }
+  .breakdown-title { font-size: 14px; color: var(--ink); font-weight: 500; margin-bottom: 18px; }
+  .breakdown-row { margin-bottom: 14px; }
+  .breakdown-row:last-child { margin-bottom: 0; }
+  .breakdown-row .head {
+    display: flex; justify-content: space-between;
+    font-size: 12px; margin-bottom: 6px;
+  }
+  .breakdown-row .head .name { color: var(--muted); }
+  .breakdown-row .head .val { color: var(--ink); font-weight: 500; }
+  .breakdown-bar {
+    height: 5px; background: var(--hairline-2);
+    border-radius: 3px; overflow: hidden;
+  }
+  .breakdown-bar > div { height: 100%; border-radius: 3px; }
+
+  /* ============ TOAST ============ */
+  .toast-container {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    z-index: 2000;
+    pointer-events: none;
+  }
+  .toast {
+    background: var(--ink); color: #FFFFFF;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 13px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    margin-bottom: 8px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: all 0.3s;
+    pointer-events: auto;
+  }
+  .toast.visible { opacity: 1; transform: translateY(0); }
+
+  /* ============ MOBILE ============ */
+  @media (max-width: 768px) {
+    .nav-bar { padding: 10px 16px; }
+    .nav-pills { display: none; }
+    .nav-pills.mobile-open { display: flex; flex-direction: column; position: absolute; top: 56px; left: 0; right: 0; background: var(--night); padding: 12px; }
+
+    .landing-h1 { font-size: 44px; letter-spacing: -1.5px; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .landing-pricing { padding: 0 16px 48px; }
+
+    .member-page { padding: 32px 16px 48px; }
+    .greeting-h2 { font-size: 28px; }
+    .hero-card { padding: 24px; }
+    .hero-top { flex-direction: column; gap: 16px; }
+    .hero-countdown { text-align: left; }
+    .stats-row { grid-template-columns: 1fr; }
+
+    .waiting-content { padding: 48px 16px 32px; }
+    .waiting-title { font-size: 36px; letter-spacing: -1.5px; }
+    .countdown-row { gap: 8px; }
+    .count-box { padding: 16px 18px; min-width: 72px; }
+    .count-num { font-size: 30px; }
+    .waiting-footer { flex-direction: column; gap: 16px; padding: 20px 16px; }
+    .wf-divider { display: none; }
+
+    .admin-shell { grid-template-columns: 1fr; }
+    .admin-side { display: none; }
+    .admin-main { padding: 24px 16px; }
+    .metric-row { grid-template-columns: 1fr 1fr; }
+    .breakdown-grid { grid-template-columns: 1fr; }
+    .shows-row { grid-template-columns: 60px 1fr; gap: 12px; }
+    .shows-row > *:nth-child(n+3) { display: none; }
+    .admin-head { flex-direction: column; gap: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="nav-bar">
+  <div class="nav-brand" onclick="showScreen('landing')">
+    <span class="logo">Morayo</span>
+    <span class="tag">SHOW</span>
+  </div>
+  <div class="nav-pills">
+    <div class="nav-pill" data-screen="landing" onclick="showScreen('landing')">Landing</div>
+    <div class="nav-pill" data-screen="member" onclick="showScreen('member')">Member</div>
+    <div class="nav-pill" data-screen="waiting" onclick="showScreen('waiting')">Pre-show</div>
+    <div class="nav-pill" data-screen="admin-shows" onclick="showScreen('admin-shows')">Admin · shows</div>
+    <div class="nav-pill" data-screen="admin-revenue" onclick="showScreen('admin-revenue')">Admin · revenue</div>
+  </div>
+</div>
+
+<div id="screen-landing" class="screen active page">
+  <div class="landing-hero">
+    <div class="landing-badge">
+      <span class="dot"></span>
+      <span>Season 4 — virtual audience now open</span>
+    </div>
+    <h1 class="landing-h1">A seat <span class="accent">in the room.</span></h1>
+    <p class="landing-sub">Join the live taping of The Morayo Show from anywhere in the world. Real conversations, real guests, real-time.</p>
+  </div>
+
+  <div class="landing-pricing">
+    <div class="pricing-grid">
+      <div class="pricing-card" onclick="selectPlan('weekly')">
+        <div class="pricing-tier">WEEKLY</div>
+        <div class="pricing-amount">
+          <span class="num">$2</span>
+          <span class="per">/ week</span>
+        </div>
+        <div class="pricing-naira">or ₦2,500</div>
+        <div class="pricing-divider"></div>
+        <div class="pricing-feat"><span class="dot"></span>One live show access</div>
+        <div class="pricing-feat"><span class="dot"></span>Cancel anytime</div>
+        <div class="pricing-feat"><span class="dot"></span>Email reminders</div>
+        <div class="pricing-cta">Choose weekly</div>
+      </div>
+
+      <div class="pricing-card featured" onclick="selectPlan('monthly')">
+        <div class="featured-badge">MOST POPULAR</div>
+        <div class="pricing-tier">MONTHLY</div>
+        <div class="pricing-amount">
+          <span class="num">$5</span>
+          <span class="per">/ month</span>
+        </div>
+        <div class="pricing-naira">or ₦6,500</div>
+        <div class="pricing-divider"></div>
+        <div class="pricing-feat"><span class="dot"></span>All live shows monthly</div>
+        <div class="pricing-feat"><span class="dot"></span>Replay archive access</div>
+        <div class="pricing-feat"><span class="dot"></span>Member-only Q&amp;A</div>
+        <div class="pricing-cta primary">Choose monthly</div>
+      </div>
+
+      <div class="pricing-card" onclick="selectPlan('annual')">
+        <div class="pricing-tier">ANNUAL</div>
+        <div class="pricing-amount">
+          <span class="num">$50</span>
+          <span class="per">/ year</span>
+        </div>
+        <div class="pricing-naira">or ₦70,000</div>
+        <div class="pricing-divider"></div>
+        <div class="pricing-feat"><span class="dot"></span>Everything in monthly</div>
+        <div class="pricing-feat"><span class="dot"></span>Save 16% annually</div>
+        <div class="pricing-feat"><span class="dot"></span>Priority seat allocation</div>
+        <div class="pricing-cta">Choose annual</div>
+      </div>
+    </div>
+    <div class="landing-footer-note">Pricing auto-detected by region · Secured by Paystack &amp; Stripe</div>
+  </div>
+</div>
+
+<div id="screen-member" class="screen page">
+  <div class="member-page">
+    <div class="greeting-block">
+      <div class="greeting-eyebrow">Welcome back</div>
+      <h2 class="greeting-h2">Adunni, your seat is reserved.</h2>
+    </div>
+
+    <div class="hero-card">
+      <div class="hero-top">
+        <div>
+          <div class="hero-pill">
+            <span class="dot"></span>
+            <span>NEXT LIVE</span>
+          </div>
+          <h3 class="hero-title">Episode 47 — The art of saying no</h3>
+          <div class="hero-meta">Wednesday, May 6 · 8:00 PM WAT</div>
+        </div>
+        <div class="hero-countdown">
+          <div class="label">Starts in</div>
+          <div class="time" id="member-countdown">2d 14h</div>
+        </div>
+      </div>
+
+      <div class="join-link-card">
+        <div class="join-link-label">YOUR PERSONAL JOIN LINK</div>
+        <div class="join-link-row">
+          <div class="join-link-url" id="join-url">zoom.us/w/8472916482?tk=a8X2jR9pQzMnVbF7</div>
+          <div class="join-link-actions">
+            <div class="join-btn copy" onclick="copyLink()">Copy</div>
+            <div class="join-btn go" onclick="showScreen('waiting')">Open ↗</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-disclaimer">
+        <span class="info-icon">i</span>
+        <span>Tied to your email — sharing won't work. Sign in with adunni@gmail.com to join.</span>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="label">SUBSCRIPTION</div>
+        <div class="value">
+          <span class="dot"></span>
+          <span>Monthly active</span>
+        </div>
+        <div class="meta">Renews May 27 · ₦6,500</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">SHOWS ATTENDED</div>
+        <div class="value">12 <span style="font-size: 12px; color: var(--muted-2); font-weight: 400;">this season</span></div>
+        <div class="meta">3-show streak · keep going</div>
+      </div>
+    </div>
+
+    <div class="upcoming-section">
+      <div class="upcoming-head">
+        <div class="upcoming-title">Upcoming this month</div>
+        <div class="upcoming-link">View all →</div>
+      </div>
+
+      <div class="show-row" onclick="showScreen('waiting')">
+        <div class="show-row-left">
+          <div class="date-block featured">
+            <div class="m">MAY</div>
+            <div class="d">06</div>
+          </div>
+          <div class="show-row-info">
+            <div class="title">The art of saying no</div>
+            <div class="meta">Wed · 8:00 PM WAT · 80 seats</div>
+          </div>
+        </div>
+        <div class="pill success"><span class="dot"></span>Registered</div>
+      </div>
+
+      <div class="show-row">
+        <div class="show-row-left">
+          <div class="date-block standard">
+            <div class="m">MAY</div>
+            <div class="d">13</div>
+          </div>
+          <div class="show-row-info">
+            <div class="title">Money &amp; the modern woman</div>
+            <div class="meta">Wed · 8:00 PM WAT · with Tara Fela-D.</div>
+          </div>
+        </div>
+        <div class="pill neutral">Auto-register</div>
+      </div>
+
+      <div class="show-row">
+        <div class="show-row-left">
+          <div class="date-block standard">
+            <div class="m">MAY</div>
+            <div class="d">20</div>
+          </div>
+          <div class="show-row-info">
+            <div class="title">When ambition meets motherhood</div>
+            <div class="meta">Wed · 8:00 PM WAT · panel of 4</div>
+          </div>
+        </div>
+        <div class="pill neutral">Auto-register</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="screen-waiting" class="screen page">
+  <div class="waiting-room">
+    <div class="waiting-content">
+      <div class="waiting-eyebrow">EPISODE 47</div>
+      <h1 class="waiting-title">The art of saying no</h1>
+      <p class="waiting-meta">Wednesday · 8:00 PM WAT · with guest Bisola Aiyeola</p>
+
+      <div class="countdown-row">
+        <div class="count-box">
+          <div class="count-num" id="cd-h">00</div>
+          <div class="count-label">HOURS</div>
+        </div>
+        <div class="count-box">
+          <div class="count-num" id="cd-m">12</div>
+          <div class="count-label">MINUTES</div>
+        </div>
+        <div class="count-box live">
+          <div class="count-num" id="cd-s">47</div>
+          <div class="count-label">SECONDS</div>
+        </div>
+      </div>
+
+      <button class="enter-cta" onclick="enterAudience()">Enter the live audience</button>
+      <div class="enter-meta">Door opens 30 minutes before show · seat A12 reserved for you</div>
+    </div>
+
+    <div class="waiting-footer">
+      <div class="wf-item">
+        <div class="label">Today's audience</div>
+        <div class="value">68 / 80 confirmed</div>
+      </div>
+      <div class="wf-divider"></div>
+      <div class="wf-item">
+        <div class="label">Your verification</div>
+        <div class="value wf-success">✓ Authenticated</div>
+      </div>
+      <div class="wf-divider"></div>
+      <div class="wf-item">
+        <div class="label">Stream watermark</div>
+        <div class="value">adunni@gmail.com</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="screen-admin-shows" class="screen page">
+  <div class="admin-shell">
+    <div class="admin-side">
+      <div class="admin-brand">
+        <div class="logo">Morayo</div>
+        <div class="role">SHOW · ADMIN</div>
+      </div>
+      <div class="side-section-label">NAVIGATION</div>
+      <div class="side-nav">
+        <div class="side-nav-item" onclick="showToast('Dashboard view')">Dashboard</div>
+        <div class="side-nav-item active">Shows</div>
+        <div class="side-nav-item" onclick="showToast('Registrations view')">Registrations</div>
+        <div class="side-nav-item" onclick="showToast('Subscribers view')">Subscribers</div>
+        <div class="side-nav-item" onclick="showScreen('admin-revenue')">Revenue</div>
+        <div class="side-nav-item" onclick="showToast('Settings view')">Settings</div>
+      </div>
+      <div class="side-section-label">QUICK STATS</div>
+      <div class="quick-stat-card">
+        <div class="quick-stat-label">Active subscribers</div>
+        <div class="quick-stat-value">2,657</div>
+        <div class="quick-stat-trend">+184 this week</div>
+      </div>
+    </div>
+
+    <div class="admin-main">
+      <div class="admin-head">
+        <div>
+          <h2 class="admin-h1">Shows</h2>
+          <p class="admin-sub">Schedule, registrations, and live access control</p>
+        </div>
+        <div class="admin-actions">
+          <button class="admin-btn" onclick="showToast('Filters open')">Filter</button>
+          <button class="admin-btn primary" onclick="showToast('New show created')">+ New show</button>
+        </div>
+      </div>
+
+      <div class="metric-row">
+        <div class="metric-card">
+          <div class="label">NEXT SHOW</div>
+          <div class="value">May 6</div>
+          <div class="trend flat">in 2 days</div>
+        </div>
+        <div class="metric-card">
+          <div class="label">SEATS FILLED</div>
+          <div class="value">68 / 80</div>
+          <div class="progress-bar"><div style="width: 85%;"></div></div>
+        </div>
+        <div class="metric-card">
+          <div class="label">WAITLIST</div>
+          <div class="value">23</div>
+          <div class="trend flat">monthly+ tier</div>
+        </div>
+        <div class="metric-card">
+          <div class="label">AUTO-REVOKED</div>
+          <div class="value">12</div>
+          <div class="trend down">past 7 days</div>
+        </div>
+      </div>
+
+      <div class="section-label">UPCOMING SHOWS</div>
+
+      <div class="shows-table">
+        <div class="shows-row" onclick="showToast('Episode 47 detail opening')">
+          <div class="shows-date featured">
+            <div class="m">MAY</div>
+            <div class="d">06</div>
+            <div class="t">8:00 PM</div>
+          </div>
+          <div class="shows-info">
+            <div class="title">The art of saying no</div>
+            <div class="meta">Episode 47 · Bisola Aiyeola · webinar ID 847291</div>
+          </div>
+          <div class="shows-fill">
+            <div class="top">68 / 80</div>
+            <div class="bot">12 vacant</div>
+          </div>
+          <div class="pill success" style="width: fit-content;"><span class="dot"></span>Confirmed</div>
+          <div class="shows-action">Manage →</div>
+        </div>
+
+        <div class="shows-row" onclick="showToast('Episode 48 detail opening')">
+          <div class="shows-date standard">
+            <div class="m">MAY</div>
+            <div class="d">13</div>
+            <div class="t">8:00 PM</div>
+          </div>
+          <div class="shows-info">
+            <div class="title">Money &amp; the modern woman</div>
+            <div class="meta">Episode 48 · Tara Fela-Durotoye · draft</div>
+          </div>
+          <div class="shows-fill">
+            <div class="top">42 / 80</div>
+            <div class="bot">38 vacant</div>
+          </div>
+          <div class="pill warning" style="width: fit-content;"><span class="dot"></span>Draft</div>
+          <div class="shows-action">Manage →</div>
+        </div>
+
+        <div class="shows-row" onclick="showToast('Episode 49 detail opening')">
+          <div class="shows-date standard">
+            <div class="m">MAY</div>
+            <div class="d">20</div>
+            <div class="t">8:00 PM</div>
+          </div>
+          <div class="shows-info">
+            <div class="title">When ambition meets motherhood</div>
+            <div class="meta">Episode 49 · panel of 4 · scheduled</div>
+          </div>
+          <div class="shows-fill">
+            <div class="top">19 / 80</div>
+            <div class="bot">61 vacant</div>
+          </div>
+          <div class="pill info" style="width: fit-content;"><span class="dot"></span>Open</div>
+          <div class="shows-action">Manage →</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="screen-admin-revenue" class="screen page">
+  <div class="admin-shell">
+    <div class="admin-side">
+      <div class="admin-brand">
+        <div class="logo">Morayo</div>
+        <div class="role">SHOW · ADMIN</div>
+      </div>
+      <div class="side-section-label">NAVIGATION</div>
+      <div class="side-nav">
+        <div class="side-nav-item" onclick="showToast('Dashboard view')">Dashboard</div>
+        <div class="side-nav-item" onclick="showScreen('admin-shows')">Shows</div>
+        <div class="side-nav-item" onclick="showToast('Registrations view')">Registrations</div>
+        <div class="side-nav-item" onclick="showToast('Subscribers view')">Subscribers</div>
+        <div class="side-nav-item active">Revenue</div>
+        <div class="side-nav-item" onclick="showToast('Settings view')">Settings</div>
+      </div>
+    </div>
+
+    <div class="admin-main">
+      <div class="admin-head">
+        <div>
+          <h2 class="admin-h1">Revenue</h2>
+          <p class="admin-sub">Subscription health · April 2026</p>
+        </div>
+        <div class="admin-time-toggle">
+          <div class="item" onclick="setTimeRange(this, '7d')">7d</div>
+          <div class="item active" onclick="setTimeRange(this, '30d')">30d</div>
+          <div class="item" onclick="setTimeRange(this, '90d')">90d</div>
+          <div class="item" onclick="setTimeRange(this, 'YTD')">YTD</div>
+        </div>
+      </div>
+
+      <div class="metric-row">
+        <div class="metric-card">
+          <div class="label">MRR</div>
+          <div class="value">$13,284</div>
+          <div class="trend up">↑ 12.4%</div>
+        </div>
+        <div class="metric-card">
+          <div class="label">ACTIVE SUBS</div>
+          <div class="value">2,657</div>
+          <div class="trend up">↑ 184</div>
+        </div>
+        <div class="metric-card">
+          <div class="label">CHURN</div>
+          <div class="value">3.2%</div>
+          <div class="trend down">↑ 0.4%</div>
+        </div>
+        <div class="metric-card">
+          <div class="label">ARPU</div>
+          <div class="value">$5.00</div>
+          <div class="trend flat">flat</div>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-head">
+          <div>
+            <div class="chart-title">Revenue trend</div>
+            <div class="chart-sub">USD &amp; Naira combined</div>
+          </div>
+          <div class="chart-legend">
+            <span class="item"><span class="swatch" style="background: var(--crimson);"></span>This month</span>
+            <span class="item"><span class="swatch" style="background: #D3D1C7;"></span>Last month</span>
+          </div>
+        </div>
+        <svg viewBox="0 0 600 180" width="100%" style="display: block;">
+          <line x1="0" y1="40" x2="600" y2="40" stroke="#F1EFE8" stroke-width="0.5"/>
+          <line x1="0" y1="80" x2="600" y2="80" stroke="#F1EFE8" stroke-width="0.5"/>
+          <line x1="0" y1="120" x2="600" y2="120" stroke="#F1EFE8" stroke-width="0.5"/>
+          <polyline points="0,138 50,134 100,132 150,128 200,124 250,118 300,114 350,108 400,102 450,98 500,92 550,88 600,84"
+            fill="none" stroke="#D3D1C7" stroke-width="1.5"
+            stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="4 4"/>
+          <polyline points="0,140 50,130 100,124 150,114 200,118 250,104 300,96 350,88 400,72 450,64 500,48 550,34 600,22"
+            fill="none" stroke="#8B1F2F" stroke-width="2.5"
+            stroke-linejoin="round" stroke-linecap="round"/>
+          <circle cx="600" cy="22" r="4" fill="#8B1F2F"/>
+          <circle cx="600" cy="22" r="8" fill="#8B1F2F" opacity="0.2"/>
+          <text x="0" y="170" font-size="10" fill="#888780" font-family="Inter">Apr 1</text>
+          <text x="148" y="170" font-size="10" fill="#888780" font-family="Inter">Apr 8</text>
+          <text x="296" y="170" font-size="10" fill="#888780" font-family="Inter">Apr 15</text>
+          <text x="444" y="170" font-size="10" fill="#888780" font-family="Inter">Apr 22</text>
+          <text x="558" y="170" font-size="10" fill="#888780" font-family="Inter">Apr 30</text>
+        </svg>
+      </div>
+
+      <div class="breakdown-grid">
+        <div class="breakdown-card">
+          <div class="breakdown-title">By region</div>
+          <div class="breakdown-row">
+            <div class="head"><span class="name">Nigeria · Paystack</span><span class="val">62%</span></div>
+            <div class="breakdown-bar"><div style="width: 62%; background: #1D9E75;"></div></div>
+          </div>
+          <div class="breakdown-row">
+            <div class="head"><span class="name">USA &amp; UK · Stripe</span><span class="val">28%</span></div>
+            <div class="breakdown-bar"><div style="width: 28%; background: #378ADD;"></div></div>
+          </div>
+          <div class="breakdown-row">
+            <div class="head"><span class="name">Rest of world · Stripe</span><span class="val">10%</span></div>
+            <div class="breakdown-bar"><div style="width: 10%; background: #7F77DD;"></div></div>
+          </div>
+        </div>
+
+        <div class="breakdown-card">
+          <div class="breakdown-title">By tier</div>
+          <div class="breakdown-row">
+            <div class="head"><span class="name">Monthly</span><span class="val">1,824 subs</span></div>
+            <div class="breakdown-bar"><div style="width: 69%; background: #8B1F2F;"></div></div>
+          </div>
+          <div class="breakdown-row">
+            <div class="head"><span class="name">Annual</span><span class="val">512 subs</span></div>
+            <div class="breakdown-bar"><div style="width: 19%; background: #BA7517;"></div></div>
+          </div>
+          <div class="breakdown-row">
+            <div class="head"><span class="name">Weekly</span><span class="val">321 subs</span></div>
+            <div class="breakdown-bar"><div style="width: 12%; background: #5F5E5A;"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+  function showScreen(screenName) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-' + screenName).classList.add('active');
+
+    document.querySelectorAll('.nav-pill').forEach(p => p.classList.remove('active'));
+    const pill = document.querySelector(`.nav-pill[data-screen="${screenName}"]`);
+    if (pill) pill.classList.add('active');
+
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+
+  function selectPlan(plan) {
+    const labels = { weekly: 'Weekly · $2/wk', monthly: 'Monthly · $5/mo', annual: 'Annual · $50/yr' };
+    showToast(`${labels[plan]} selected — taking you to your dashboard`);
+    setTimeout(() => showScreen('member'), 900);
+  }
+
+  function copyLink() {
+    const url = document.getElementById('join-url').textContent;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url).catch(() => {});
+    }
+    showToast('Personal join link copied');
+  }
+
+  function enterAudience() {
+    showToast('Authenticating with Zoom · seat A12 reserved');
+    setTimeout(() => {
+      showToast('Welcome to The Morayo Show · live in moments');
+    }, 1400);
+  }
+
+  function setTimeRange(el, range) {
+    el.parentElement.querySelectorAll('.item').forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+    showToast(`Showing ${range} data`);
+  }
+
+  function showToast(message) {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    container.appendChild(toast);
+    requestAnimationFrame(() => toast.classList.add('visible'));
+    setTimeout(() => {
+      toast.classList.remove('visible');
+      setTimeout(() => toast.remove(), 300);
+    }, 2400);
+  }
+
+  let cdH = 0, cdM = 12, cdS = 47;
+  setInterval(() => {
+    cdS--;
+    if (cdS < 0) { cdS = 59; cdM--; }
+    if (cdM < 0) { cdM = 59; cdH--; }
+    if (cdH < 0) { cdH = 0; cdM = 12; cdS = 47; }
+    const pad = n => String(n).padStart(2, '0');
+    const h = document.getElementById('cd-h');
+    const m = document.getElementById('cd-m');
+    const s = document.getElementById('cd-s');
+    if (h) h.textContent = pad(cdH);
+    if (m) m.textContent = pad(cdM);
+    if (s) s.textContent = pad(cdS);
+  }, 1000);
+
+  document.querySelector('.nav-pill[data-screen="landing"]').classList.add('active');
+</script>
+
+</body>
+</html>

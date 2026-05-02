@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,500;1,400&family=Inter:wght@300;400;500;600&display=swap');
 @config "../tailwind.config.ts";
 @import "tailwindcss";
 @import "tw-animate-css";
@@ -41,6 +41,35 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Template custom styles */
+  --color-morayo-bg: #FAFAF7;
+  --color-morayo-surface: #FFFFFF;
+  --color-morayo-ink: #1a1a1a;
+  --color-morayo-ink-2: #3d3d3a;
+  --color-morayo-muted: #5F5E5A;
+  --color-morayo-muted-2: #888780;
+  --color-morayo-hairline: #E5E3DC;
+  --color-morayo-hairline-2: #F1EFE8;
+  --color-morayo-crimson: #8B1F2F;
+  --color-morayo-crimson-deep: #6B1623;
+  --color-morayo-coral: #E8593C;
+  --color-morayo-green: #1D9E75;
+  --color-morayo-green-bg: #E1F5EE;
+  --color-morayo-green-ink: #085041;
+  --color-morayo-amber: #EF9F27;
+  --color-morayo-amber-bg: #FAEEDA;
+  --color-morayo-amber-ink: #854F0B;
+  --color-morayo-blue: #378ADD;
+  --color-morayo-blue-bg: #E6F1FB;
+  --color-morayo-blue-ink: #0C447C;
+  --color-morayo-night: #0A0A0A;
+  --color-morayo-night-2: #1a1a1a;
+  --color-morayo-night-text: #FAFAF7;
+  --color-morayo-night-muted: #9C9A92;
+  --color-morayo-night-muted-2: #5F5E5A;
+
+  --font-fraunces: 'Fraunces', Georgia, serif;
 }
 
 :root {
@@ -127,4 +156,10 @@
   src: url('/public/signategrotesk-black.ttf') format('truetype');
   font-weight: 900;
   font-style: normal;
+}
+
+.zmmtg-root{
+  width:100% !important;
+  height:100% !important;
+  position:relative !important;
 }

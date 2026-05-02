@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import Logo from "@/assets/tmas-logo-black.png";
 import { VerificationService } from "@/services/verificationService";
 import { ROUTES } from "@/config/route";
+import VirtualNavbar from "@/components/VirtualNavbar";
 
 import {
     InputOTP,
@@ -175,7 +176,8 @@ const VerifyEmail = () => {
     })
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-green-50 to-gray-50 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-morayo-bg text-morayo-ink antialiased font-sans text-[14px] leading-[1.5] pt-[60px] flex items-center justify-center p-4">
+            <VirtualNavbar />
             <div className="w-full max-w-md">
                 {/* Header with Logo */}
                 <div className="text-center mb-8">

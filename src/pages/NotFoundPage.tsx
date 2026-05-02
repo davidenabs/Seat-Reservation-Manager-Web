@@ -1,11 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import VirtualNavbar from "@/components/VirtualNavbar";
 
 const NotFoundPage = () => {
       const navigate = useNavigate();
     return (
-        <div className="flex min-h-screen flex-col bg-[#F8FAFC]">
+        <div className="flex min-h-screen flex-col bg-morayo-bg text-morayo-ink antialiased font-sans text-[14px] leading-[1.5] pt-[60px]">
+            <VirtualNavbar />
             <div className="flex grow items-center px-6 xl:px-10">
                 <div className="mx-auto text-center">
                     <h1 className="text-[22px] font-bold leading-normal text-gray-1000 lg:text-3xl">

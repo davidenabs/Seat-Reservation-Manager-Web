@@ -7,8 +7,8 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { ROUTES } from '@/config/route';
-import { formatDate } from '@/utils/formatDate';
-import type { IOTPVerificationResponse } from '@/intefaces/verification';
+import { formatDate } from '../utils/formatDate';
+import type { IOTPVerificationResponse } from '../intefaces/verification';
 
 const defaultData = {
     // session: "The Morayo Show",

@@ -108,12 +108,12 @@ class ApiClient {
           throw apiError;
         } else if (error.request) {
           // Network error
-          toast.error('Network error. Please check your connection.');
+          // toast.error('Network error. Please check your connection.');
           console.error('Network error:', error.request);
           throw new Error('Network error. Please check your connection.');
         } else {
           // Other error
-          toast.error('An unexpected error occurred.');
+          // toast.error('An unexpected error occurred.');
           console.error('Unexpected error:', error.message);
           throw new Error(error.message);
         }
@@ -188,7 +188,7 @@ class ApiClient {
 
   // Generic PUT method
   async put<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<IAPIResponse<T>> {
-    const response = await this.client.put<IAPIResponse<T>>(url, data, config);
+    const response = await this.client.put<IAPIResponse<T> | any>(url, data, config);
     return this.handleApiResponse(response);
   }
 
