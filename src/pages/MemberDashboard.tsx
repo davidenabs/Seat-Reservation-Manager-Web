@@ -122,20 +122,32 @@ const MemberDashboard = () => {
                   {subscription.zoomJoinUrl || "Assigning single-use stream portal..."}
                 </div>
                 <div className="flex gap-2">
-                  <button
-                    className={`text-[11px] px-3 py-1.5 rounded-[7px] cursor-pointer select-none text-[#E8593C] border border-[#E8593C]/40 bg-transparent hover:bg-[#E8593C]/10 transition ${!currentEvent ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    onClick={copyLink}
-                    disabled={!currentEvent}
-                  >
-                    Copy
-                  </button>
-                  <button
-                    className={`text-[11px] px-3 py-1.5 rounded-[7px] cursor-pointer select-none bg-[#E8593C] text-white border border-[#E8593C] hover:bg-[#D14920] transition ${!currentEvent ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    onClick={() => navigate('/waiting')}
-                    disabled={!currentEvent}
-                  >
-                    Open ↗
-                  </button>
+                  {(() => {
+                    const now = new Date().getTime();
+                    const datePart = currentEvent?.date?.split('T')[0];
+                    const startTime = currentEvent?.time ? new Date(`${datePart}T${currentEvent.time}:00`).getTime() : 0;
+                    const endTime = currentEvent?.endTime ? new Date(`${datePart}T${currentEvent.endTime}:00`).getTime() : 0;
+                    const isLiveNow = currentEvent && now >= startTime && now < endTime;
+
+                    return (
+                      <>
+                        {/* <button
+                          className={`text-[11px] px-3 py-1.5 rounded-[7px] cursor-pointer select-none text-[#E8593C] border border-[#E8593C]/40 bg-transparent hover:bg-[#E8593C]/10 transition ${!isLiveNow ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
+                          onClick={copyLink}
+                          disabled={!isLiveNow}
+                        >
+                          Copy
+                        </button> */}
+                        <button
+                          className={`text-[11px] px-3 py-1.5 rounded-[7px] cursor-pointer select-none bg-[#E8593C] text-white border border-[#E8593C] hover:bg-[#D14920] transition ${!isLiveNow ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
+                          onClick={() => navigate('/waiting')}
+                          disabled={!isLiveNow}
+                        >
+                          Open ↗
+                        </button>
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
             </div>
