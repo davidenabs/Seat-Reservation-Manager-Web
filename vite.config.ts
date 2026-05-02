@@ -1,9 +1,8 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import tailwindcss from '@tailwindcss/vite'
-import path from 'path'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
+import path from "path";
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
@@ -12,11 +11,28 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    exclude: ['@zoom/meetingsdk'],
+    exclude: ["@zoom/meetingsdk"],
   },
-  build: {
-    rollupOptions: {
-      external: ['react', 'react-dom'],
-    },
-  },
-})
+});
+// import { defineConfig } from 'vite'
+// import react from '@vitejs/plugin-react'
+// import tailwindcss from '@tailwindcss/vite'
+// import path from 'path'
+
+// // https://vite.dev/config/
+// export default defineConfig({
+//   plugins: [react(), tailwindcss()],
+//   resolve: {
+//     alias: {
+//       "@": path.resolve(__dirname, "./src"),
+//     },
+//   },
+//   optimizeDeps: {
+//     exclude: ['@zoom/meetingsdk'],
+//   },
+//   build: {
+//     rollupOptions: {
+//       external: ['react', 'react-dom'],
+//     },
+//   },
+// })

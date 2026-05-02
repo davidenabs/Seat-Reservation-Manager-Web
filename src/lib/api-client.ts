@@ -1,4 +1,4 @@
-import config from '@/config/environment';
+// import config from '@/config/environment';
 import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios';
 import { toast } from 'sonner';
 import type { IAPIResponse } from '@/intefaces/api';
@@ -28,7 +28,7 @@ class ApiClient {
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
         }
-        
+
         // Log request in development
         if (process.env.NODE_ENV === 'development') {
           console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`, {
@@ -36,7 +36,7 @@ class ApiClient {
             params: config.params,
           });
         }
-        
+
         return config;
       },
       (error) => {
@@ -63,10 +63,10 @@ class ApiClient {
         if (error.response) {
           // Server responded with error status
           const { status, data } = error.response;
-          
+
           // Extract error message from different response formats
           const errorMessage = this.extractErrorMessage(data);
-          
+
           switch (status) {
             case 401:
               toast.error('Authentication required. Please login again.');
@@ -104,7 +104,7 @@ class ApiClient {
           // Attach the original response data for additional context if needed
           (apiError as any).responseData = data;
           (apiError as any).status = status;
-          
+
           throw apiError;
         } else if (error.request) {
           // Network error
@@ -161,7 +161,7 @@ class ApiClient {
   // Generic method to handle API responses and extract errors
   private handleApiResponse<T>(response: AxiosResponse<IAPIResponse<T>>): IAPIResponse<T> {
     const { data } = response;
-    
+
     if (!data.success) {
       const errorMessage = this.extractErrorMessage(data);
       const error = new Error(errorMessage);
@@ -170,7 +170,7 @@ class ApiClient {
       (error as any).status = response.status;
       throw error;
     }
-    
+
     return data;
   }
 
@@ -228,7 +228,8 @@ class ApiClient {
 }
 
 // Create and export the API client instance
-const baseUrl = config.app.devMode ? 'http://localhost:3103/api' : 'https://api.themorayobrownshow.com/api';
+// const baseUrl = config.app.devMode ? 'http://localhost:3103/api' : 'https://api.themorayobrownshow.com/api';
+const baseUrl = import.meta.env.VITE_API_BASE_URL;
 const apiClient = new ApiClient(baseUrl);
 
 export default apiClient;
