@@ -52,12 +52,20 @@ const WaitingRoom = () => {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      if (currentEvent && currentEvent.date && currentEvent.time) {
+      if (currentEvent && currentEvent.date && currentEvent.time && currentEvent.endTime) {
         const datePart = currentEvent.date.split("T")[0];
         const eventDate = new Date(`${datePart}T${currentEvent.time}:00`).getTime();
+        const eventEndDate = new Date(`${datePart}T${currentEvent.endTime}:00`).getTime();
         const now = new Date().getTime();
         const distance = eventDate - now;
+        const distanceEnd = eventEndDate - now;
 
+        if (distanceEnd <= 0) {
+          setTime({ h: 0, m: 0, s: 0 });
+          setIsLive(false);
+          return;
+        }
+        
         if (distance <= 0) {
           setTime({ h: 0, m: 0, s: 0 });
           setIsLive(true);
