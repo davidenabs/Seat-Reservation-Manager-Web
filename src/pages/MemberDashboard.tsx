@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
+// import { toast } from "sonner";
 import { format } from "date-fns";
 import VirtualNavbar from "../components/VirtualNavbar";
 import { AuthService } from "../services/authService";
@@ -51,18 +51,18 @@ const MemberDashboard = () => {
     }
   };
 
-  const copyLink = () => {
-    const url = subscription?.zoomJoinUrl || "N/A";
-    if (url === "N/A") {
-      toast.error("No Zoom URL available");
-      return;
-    }
-    navigator.clipboard.writeText(url).then(() => {
-      toast.success("Personal join link copied");
-    }).catch(() => {
-      toast.error("Failed to copy link");
-    });
-  };
+  // const copyLink = () => {
+  //   const url = subscription?.zoomJoinUrl || "N/A";
+  //   if (url === "N/A") {
+  //     toast.error("No Zoom URL available");
+  //     return;
+  //   }
+  //   navigator.clipboard.writeText(url).then(() => {
+  //     toast.success("Personal join link copied");
+  //   }).catch(() => {
+  //     toast.error("Failed to copy link");
+  //   });
+  // };
 
   if (loading) {
     return (
