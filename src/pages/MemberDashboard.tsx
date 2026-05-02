@@ -93,10 +93,19 @@ const MemberDashboard = () => {
 
             <div className="flex flex-col md:flex-row justify-between md:items-start gap-4 md:gap-0 mb-7 relative z-1">
               <div>
-                <div className="inline-flex items-center gap-1.5 px-3 py-[5px] bg-[#E8593C]/15 rounded-full mb-4">
-                  <span className="w-1.5 h-1.5 bg-[#E8593C] rounded-full animate-pulse"></span>
-                  <span className="text-[10px] text-[#E8593C] tracking-[1.2px] font-semibold">NEXT LIVE</span>
-                </div>
+                {(() => {
+                  const hasEnded = currentEvent?.endTime && currentEvent?.date && 
+                                   new Date().getTime() > new Date(`${currentEvent.date.split('T')[0]}T${currentEvent.endTime}:00`).getTime();
+                  
+                  return (
+                    <div className={`inline-flex items-center gap-1.5 px-3 py-[5px] rounded-full mb-4 ${hasEnded ? 'bg-white/10' : 'bg-[#E8593C]/15'}`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${hasEnded ? 'bg-[#8E8E93]' : 'bg-[#E8593C] animate-pulse'}`}></span>
+                      <span className={`text-[10px] tracking-[1.2px] font-semibold ${hasEnded ? 'text-[#8E8E93]' : 'text-[#E8593C]'}`}>
+                        {hasEnded ? 'EVENT ENDED' : 'NEXT LIVE'}
+                      </span>
+                    </div>
+                  );
+                })()}
                 <h3 className="font-fraunces not-italic text-[24px] font-normal m-0 mb-2 tracking-[-0.5px] text-white">
                   {currentEvent ? currentEvent.title : "TBA: Stay tuned for our next episode!"}
                 </h3>
