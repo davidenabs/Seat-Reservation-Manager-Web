@@ -75,12 +75,12 @@ class ApiClient {
 
           switch (status) {
             case 401:
-              toast.error('Authentication required. Please login again.');
+              // toast.error('Authentication required. Please login again.');
               // Redirect to login or clear auth state
               localStorage.removeItem('authToken');
               break;
             case 403:
-              toast.error('Access denied. You don\'t have permission for this action.');
+              // toast.error('Access denied. You don\'t have permission for this action.');
               break;
             case 404:
               toast.error('Resource not found.');

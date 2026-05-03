@@ -1,30 +1,49 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 import { DateTime } from "luxon";
-import VirtualNavbar from "../components/VirtualNavbar";
-import { AuthService } from "../services/authService";
 import { SubscriptionService } from "../services/subscriptionService";
-import type { ISubscription } from "@/intefaces/subscription";
+import { useDashboard } from "../components/dashboard/DashboardLayout";
+
+// Home Components
+import WelcomeHeader from "../components/dashboard/home/WelcomeHeader";
+import FeaturedEventCard from "../components/dashboard/home/FeaturedEventCard";
+import StatsGrid from "../components/dashboard/home/StatsGrid";
+import UpcomingShowsList from "../components/dashboard/home/UpcomingShowsList";
+import AdBanner from "../components/dashboard/home/AdBanner";
 
 const MemberDashboard = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState<any>(null);
-  const [subscription, setSubscription] = useState<ISubscription | null>(null);
+  const { user, subscription } = useDashboard();
   const [nextEvents, setNextEvents] = useState<any[]>([]);
   const [currentEvent, setCurrentEvent] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [timeLeft, setTimeLeft] = useState("");
+
+  const updateCountdown = useCallback(() => {
+    if (!currentEvent || !currentEvent.date || !currentEvent.time) return;
+
+    const LAGOS_ZONE = 'Africa/Lagos';
+    const datePart = DateTime.fromISO(currentEvent.date, { zone: LAGOS_ZONE }).toFormat('yyyy-MM-dd');
+    const target = DateTime.fromISO(`${datePart}T${currentEvent.time}`, { zone: LAGOS_ZONE });
+    const now = DateTime.now().setZone(LAGOS_ZONE);
+
+    const diff = target.diff(now, ['days', 'hours', 'minutes']);
+
+    if (diff.as('milliseconds') <= 0) {
+      setTimeLeft("LIVE NOW");
+    } else {
+      setTimeLeft(`${Math.floor(diff.days)}d ${Math.floor(diff.hours)}h`);
+    }
+  }, [currentEvent]);
 
   useEffect(() => {
-    const profile = AuthService.getUserProfile();
-    if (profile) {
-      setUser(profile);
-      fetchStatus(profile.email);
-      fetchNextEvent();
-    } else {
-      setLoading(false);
-    }
+    fetchNextEvent();
   }, []);
+
+  useEffect(() => {
+    const interval = setInterval(updateCountdown, 60000);
+    updateCountdown();
+    return () => clearInterval(interval);
+  }, [updateCountdown]);
 
   const fetchNextEvent = async () => {
     try {
@@ -38,224 +57,40 @@ const MemberDashboard = () => {
     }
   };
 
-  const fetchStatus = async (email: string) => {
-    try {
-      const res = await SubscriptionService.getStatus(email);
-      if (res?.success && res?.data?.subscription) {
-        setSubscription(res.data.subscription || res.data.data);
-      }
-    } catch (err) {
-      console.error("Subscription status fetch failed:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const formatEventTime = (event: any) => {
+  const formatEventTimeLong = (event: any) => {
     if (!event || !event.date || !event.time) return "Date & Time to be announced";
-    
-    // Parse the date part in Lagos context
     const datePart = DateTime.fromISO(event.date, { zone: 'Africa/Lagos' }).toFormat('yyyy-MM-dd');
-    
-    // Create the full datetime in Lagos timezone
     const lagosDateTime = DateTime.fromISO(`${datePart}T${event.time}`, { zone: 'Africa/Lagos' });
-    
-    // Format for user's local timezone
-    return lagosDateTime.setZone('local').toLocaleString(DateTime.DATETIME_MED);
+    return lagosDateTime.setZone('local').toFormat('cccc, LLLL d · h:mm a ZZZZ');
   };
 
-  const copyLink = () => {
-    const url = subscription?.zoomJoinUrl || "N/A";
-    if (url === "N/A") {
-      toast.error("No Zoom URL available");
-      return;
-    }
-    navigator.clipboard.writeText(url).then(() => {
-      toast.success("Personal join link copied");
-    }).catch(() => {
-      toast.error("Failed to copy link");
-    });
+  const getGreeting = () => {
+    const hour = DateTime.now().setZone('Africa/Lagos').hour;
+    if (hour < 12) return "Good morning";
+    if (hour < 17) return "Good afternoon";
+    return "Good evening";
   };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#0B0B0F] text-[#F4F4F6] flex justify-center items-center font-sans">
-        <div className="animate-pulse text-[#E8593C] tracking-[1px] font-medium">
-          Loading membership space...
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="min-h-screen bg-[#0B0B0F] text-[#F4F4F6] antialiased font-sans text-[14px] leading-[1.5] pt-[60px]">
-      <VirtualNavbar />
+    <div className="p-4 md:p-8 flex-1">
+      <WelcomeHeader user={user} getGreeting={getGreeting} />
 
-      <div className="max-w-[980px] mx-auto px-4 md:px-8 py-12 pb-20">
-        <div className="mb-8">
-          <div className="text-[12px] text-[#8E8E93] tracking-[0.3px] mb-2 font-medium">Welcome back</div>
-          <h2 className="font-fraunces italic font-light text-[38px] m-0 text-white tracking-[-1px] leading-[1.1]">
-            {user?.name || "Member"}, your seat is reserved.
-          </h2>
+      <div className="flex gap-8 items-start">
+        <div className="flex-1 space-y-6">
+          <FeaturedEventCard 
+            currentEvent={currentEvent}
+            timeLeft={timeLeft}
+            subscription={subscription}
+            formatEventTimeLong={formatEventTimeLong}
+            onEnter={() => navigate('/waiting')}
+          />
+
+          <StatsGrid subscription={subscription} />
+
+          <UpcomingShowsList nextEvents={nextEvents} />
         </div>
 
-        {subscription?.status === "active" ? (
-          <div className="bg-white/[0.02] border border-white/10 text-[#F4F4F6] rounded-[20px] p-6 md:p-8 mb-6 relative overflow-hidden">
-            {/* Background glow */}
-            <div className="absolute top-0 right-0 w-[280px] h-[280px] bg-[radial-gradient(circle,_rgba(232,89,60,0.12)_0%,_transparent_70%)] pointer-events-none"></div>
-
-            <div className="flex flex-col md:flex-row justify-between md:items-start gap-4 md:gap-0 mb-7 relative z-1">
-              <div>
-                {(() => {
-                  const LAGOS_ZONE = 'Africa/Lagos';
-                  const now = DateTime.now().setZone(LAGOS_ZONE);
-                  const datePart = currentEvent?.date ? DateTime.fromISO(currentEvent.date, { zone: LAGOS_ZONE }).toFormat('yyyy-MM-dd') : null;
-                  const endDateTime = (currentEvent && datePart && currentEvent.endTime) 
-                    ? DateTime.fromISO(`${datePart}T${currentEvent.endTime}`, { zone: LAGOS_ZONE })
-                    : null;
-                  
-                  const hasEnded = endDateTime && now > endDateTime;
-                  
-                  return (
-                    <div className={`inline-flex items-center gap-1.5 px-3 py-[5px] rounded-full mb-4 ${hasEnded ? 'bg-white/10' : 'bg-[#E8593C]/15'}`}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${hasEnded ? 'bg-[#8E8E93]' : 'bg-[#E8593C] animate-pulse'}`}></span>
-                      <span className={`text-[10px] tracking-[1.2px] font-semibold ${hasEnded ? 'text-[#8E8E93]' : 'text-[#E8593C]'}`}>
-                        {hasEnded ? 'EVENT ENDED' : 'NEXT LIVE'}
-                      </span>
-                    </div>
-                  );
-                })()}
-                <h3 className="font-fraunces not-italic text-[24px] font-normal m-0 mb-2 tracking-[-0.5px] text-white">
-                  {currentEvent ? currentEvent.title : "TBA: Stay tuned for our next episode!"}
-                </h3>
-                <div className="text-[13px] text-[#8E8E93]">
-                  {formatEventTime(currentEvent)}
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white/[0.04] border border-white/10 rounded-xl p-4 mb-4 relative z-1">
-              <div className="text-[10px] text-[#8E8E93] tracking-[1.2px] mb-2 font-semibold">YOUR PERSONAL JOIN LINK</div>
-              <div className="flex items-center justify-between gap-3">
-                <div className="font-mono text-[12px] text-[#C9C9C4] overflow-hidden text-ellipsis whitespace-nowrap flex-1">
-                  {subscription.zoomJoinUrl || "Assigning single-use stream portal..."}
-                </div>
-                <div className="flex gap-2">
-                  {(() => {
-                    const LAGOS_ZONE = 'Africa/Lagos';
-                    const now = DateTime.now().setZone(LAGOS_ZONE);
-                    const datePart = currentEvent?.date ? DateTime.fromISO(currentEvent.date, { zone: LAGOS_ZONE }).toFormat('yyyy-MM-dd') : null;
-                    const startDateTime = (currentEvent && datePart && currentEvent.time) 
-                      ? DateTime.fromISO(`${datePart}T${currentEvent.time}`, { zone: LAGOS_ZONE })
-                      : null;
-                    const endDateTime = (currentEvent && datePart && currentEvent.endTime) 
-                      ? DateTime.fromISO(`${datePart}T${currentEvent.endTime}`, { zone: LAGOS_ZONE })
-                      : null;
-
-                    const isLiveNow = currentEvent && startDateTime && endDateTime && now >= startDateTime && now < endDateTime;
-
-                    return (
-                      <>
-                        <button
-                          className={`text-[11px] px-3 py-1.5 rounded-[7px] cursor-pointer select-none text-[#E8593C] border border-[#E8593C]/40 bg-transparent hover:bg-[#E8593C]/10 transition ${!isLiveNow ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
-                          onClick={copyLink}
-                          disabled={!isLiveNow}
-                        >
-                          Copy
-                        </button>
-                        <button
-                          className={`text-[11px] px-3 py-1.5 rounded-[7px] cursor-pointer select-none bg-[#E8593C] text-white border border-[#E8593C] hover:bg-[#D14920] transition ${!isLiveNow ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
-                          onClick={() => navigate('/waiting')}
-                          disabled={!isLiveNow}
-                        >
-                          Open ↗
-                        </button>
-                      </>
-                    );
-                  })()}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2.5 text-[12px] text-[#8E8E93] relative z-1">
-              <span className="w-[14px] h-[14px] border border-[#8E8E93] rounded-full inline-flex items-center justify-center text-[9px] flex-shrink-0">i</span>
-              <span>Tied to your email — sharing won't work. Sign in with <strong>{user?.email}</strong> to join.</span>
-            </div>
-          </div>
-        ) : (
-          <div className="bg-white/[0.02] border border-white/10 rounded-[20px] p-6 md:p-8 mb-6 text-center">
-            <h3 className="font-fraunces italic text-[24px] font-normal mb-2 text-white">
-              Access Gateway Paused
-            </h3>
-            <p className="text-[#8E8E93] max-w-[480px] mx-auto mb-6 text-[14px]">
-              You do not have an active stream tier. Access immediate interactive features by subscribing safely.
-            </p>
-            <button
-              onClick={() => navigate('/subscription')}
-              className="px-12 py-4 bg-[#E8593C] hover:bg-[#D14920] text-white font-medium rounded-full transition shadow-lg shadow-[#E8593C]/20"
-            >
-              Subscribe / Enable Stream
-            </button>
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-8">
-          <div className="bg-white/[0.02] border border-white/10 rounded-[14px] p-[18px]">
-            <div className="text-[11px] text-[#8E8E93] tracking-[0.5px] mb-2.5 font-medium">TIER STATUS</div>
-            <div className="flex items-center gap-2 text-[16px] text-white font-medium mb-1">
-              <span className={`w-[7px] h-[7px] rounded-full ${subscription?.status === 'active' ? 'bg-[#5DCAA5]' : 'bg-[#E8593C]'}`}></span>
-              <span className="capitalize">{subscription?.status || 'Inactive'}</span>
-            </div>
-            <div className="text-[11px] text-[#8E8E93] font-medium uppercase">{subscription?.tier || 'None'}</div>
-          </div>
-
-          <div className="bg-white/[0.02] border border-white/10 rounded-[14px] p-[18px]">
-            <div className="text-[11px] text-[#8E8E93] tracking-[0.5px] mb-2.5 font-medium">SHOW ATTENDED</div>
-            <div className="flex items-center gap-2 text-[16px] text-white font-medium mb-1">
-              12 <span className="text-[12px] text-[#8E8E93] font-normal">this season
-              </span>
-            </div>
-            <div className="text-[11px] text-[#8E8E93] font-medium">3-show streak · keep going
-            </div>
-          </div>
-        </div>
-
-        <div>
-          {nextEvents.length > 0 && (
-            <div className="mt-8">
-              <div className="flex justify-between items-center mb-4">
-                <div className="text-[14px] text-white font-medium">Upcoming this month</div>
-              </div>
-
-              {nextEvents.map((event, idx) => (
-                <div key={event.id || idx} className="bg-white/[0.02] border border-white/10 rounded-[12px] p-4 flex items-center justify-between transition-all duration-200 cursor-pointer hover:border-[#8E8E93] hover:translate-x-[2px] mb-3">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-[10px] flex flex-col items-center justify-center shrink-0 bg-[#E8593C]/10">
-                      <div className="text-[9px] tracking-[0.5px] font-medium text-[#E8593C]">
-                        {DateTime.fromISO(event.date).toFormat('MMM').toUpperCase()}
-                      </div>
-                      <div className="text-[18px] font-medium leading-none mt-[2px] text-[#E8593C]">
-                        {DateTime.fromISO(event.date).toFormat('dd')}
-                      </div>
-                    </div>
-                    <div>
-                      <div className="text-[14px] text-white mb-[3px] font-medium">
-                        {event.title}
-                      </div>
-                      <div className="text-[12px] text-[#8E8E93]">
-                        {`${DateTime.fromISO(`${event.date.split('T')[0]}T${event.time}:00`).toFormat('EEE · h:mm a')} WAT`} · {event.availableSeats || 0} seats
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-[11px] py-[5px] px-[11px] rounded-full inline-flex items-center gap-[6px] whitespace-nowrap bg-[#5DCAA5]/10 text-[#5DCAA5]">
-                    <span className="w-[5px] h-[5px] rounded-full bg-[#5DCAA5]"></span>
-                    Registered
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <AdBanner />
       </div>
     </div>
   );

@@ -5,11 +5,14 @@ import CancelReservation from "@/pages/CancelReservation";
 import Subscription from "@/pages/Subscription";
 import MemberDashboard from "@/pages/MemberDashboard";
 import WaitingRoom from "@/pages/WaitingRoom";
-import UserLogin from "@/pages/UserLogin";
-import UserRegister from "@/pages/UserRegister";
+import Auth from "@/pages/Auth";
 import UserForgotPassword from "@/pages/UserForgotPassword";
 import UserResetPassword from "@/pages/UserResetPassword";
-import UserVerifyEmail from "@/pages/UserVerifyEmail";
+import Transactions from "@/pages/Transactions";
+import Profile from "@/pages/Profile";
+import Resources from "@/pages/Resources";
+import DashboardLayout from "@/components/dashboard/DashboardLayout";
+
 import ZoomPortal from "@/pages/ZoomPortal";
 import type { CustomRouteObject } from "@/types/route.type";
 import { ROUTES } from "@/config/route";
@@ -23,6 +26,7 @@ export const reservationRoutes: CustomRouteObject[] = [
     {
         path: ROUTES.MEMBER,
         element: <RouteGuard><MemberDashboard /></RouteGuard>,
+        layout: DashboardLayout,
     },
     {
         path: ROUTES.WAITING,
@@ -46,11 +50,11 @@ export const reservationRoutes: CustomRouteObject[] = [
     },
     {
         path: ROUTES.LOGIN,
-        element: <UserLogin />,
+        element: <Auth />,
     },
     {
         path: ROUTES.REGISTER,
-        element: <UserRegister />,
+        element: <Auth />,
     },
     {
         path: ROUTES.FORGOT_PASSWORD,
@@ -62,11 +66,26 @@ export const reservationRoutes: CustomRouteObject[] = [
     },
     {
         path: ROUTES.VERIFY_EMAIL,
-        element: <UserVerifyEmail />,
+        element: <VerifyEmail />,
     },
     {
         path: ROUTES.SUBSCRIPTION,
         element: <Subscription />,
+    },
+    {
+        path: ROUTES.TRANSACTIONS,
+        element: <RouteGuard><Transactions /></RouteGuard>,
+        layout: DashboardLayout,
+    },
+    {
+        path: ROUTES.PROFILE,
+        element: <RouteGuard><Profile /></RouteGuard>,
+        layout: DashboardLayout,
+    },
+    {
+        path: ROUTES.RESOURCES,
+        element: <RouteGuard><Resources /></RouteGuard>,
+        layout: DashboardLayout,
     },
     {
         path: "/zoom-portal",

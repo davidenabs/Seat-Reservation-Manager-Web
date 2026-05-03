@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import VirtualNavbar from "../components/VirtualNavbar";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AuthService } from "../services/authService";
 import { SubscriptionService } from "../services/subscriptionService";
 
@@ -10,6 +10,24 @@ const Subscription = () => {
   const navigate = useNavigate();
   const [_loading, setLoading] = useState(false);
   const [currency, setCurrency] = useState<'NGN' | 'USD'>('NGN');
+  const [currentTier, setCurrentTier] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchCurrentPlan = async () => {
+      const user = AuthService.getUserProfile();
+      if (user) {
+        try {
+          const res = await SubscriptionService.getStatus(user.email);
+          if (res?.success && res.data?.subscription) {
+            setCurrentTier(res.data.subscription.tier);
+          }
+        } catch (err) {
+          console.error("Failed to fetch current plan:", err);
+        }
+      }
+    };
+    fetchCurrentPlan();
+  }, []);
 
   const selectPlan = async (plan: string) => {
     const user = AuthService.getUserProfile();
@@ -60,7 +78,7 @@ const Subscription = () => {
   };
 
   return (
-    <div className="min-h-screen bg-morayo-bg text-morayo-ink antialiased font-sans text-[14px] leading-[1.5] pt-[60px]">
+    <div className=" bg-morayo-bg text-morayo-ink antialiased font-sans text-[14px] leading-[1.5]">
       <VirtualNavbar />
 
       <div className="px-8 pt-24 pb-12 text-center relative">
@@ -69,7 +87,7 @@ const Subscription = () => {
           <span className="text-[12px] text-[#993C1D] tracking-[0.3px]">Season 4 — virtual audience now open</span>
         </div>
         <h1 className="font-fraunces italic font-light text-[44px] md:text-[72px] leading-none m-0 mb-5 text-morayo-ink tracking-[-1.5px] md:tracking-[-2.5px]">
-          A seat <span className="text-morayo-coral italic">in the room.</span>
+          Your seat <span className="text-morayo-coral italic"><br />in the room.</span>
         </h1>
         <p className="text-[16px] text-morayo-muted max-w-[460px] mx-auto mb-10 leading-[1.6]">
           Join the live taping of The Morayo Show from anywhere in the world. Real conversations, real guests, real-time.
@@ -98,9 +116,18 @@ const Subscription = () => {
           
           {/* Weekly Plan */}
           <div 
-            className="bg-morayo-surface border border-morayo-hairline rounded-[18px] px-7 py-8 relative transition-all duration-250 ease-in-out cursor-pointer hover:border-morayo-ink hover:-translate-y-0.5"
+            className={`bg-morayo-surface border border-morayo-hairline rounded-[18px] px-7 py-8 relative transition-all duration-250 ease-in-out cursor-pointer ${
+              currentTier?.startsWith('weekly') 
+              ? 'opacity-50 grayscale-[0.5] pointer-events-none' 
+              : 'hover:border-morayo-ink hover:-translate-y-0.5'
+            }`}
             onClick={() => selectPlan('weekly')}
           >
+            {currentTier?.startsWith('weekly') && (
+              <div className="absolute -top-[11px] left-1/2 -translate-x-1/2 bg-gray-400 text-white text-[10px] px-3 py-[5px] rounded-full tracking-[1.2px] font-medium">
+                CURRENT PLAN
+              </div>
+            )}
             <div className="text-[11px] text-morayo-muted-2 tracking-[1.8px] mb-[18px] font-medium">WEEKLY</div>
             <div className="flex items-baseline gap-1 mb-1">
               <span className="font-fraunces not-italic text-[44px] text-morayo-ink font-normal tracking-[-2px] leading-none">
@@ -126,12 +153,22 @@ const Subscription = () => {
 
           {/* Monthly Plan (Featured) */}
           <div 
-            className="bg-morayo-surface border-[1.5px] border-morayo-crimson rounded-[18px] px-7 py-8 relative transition-all duration-250 ease-in-out cursor-pointer hover:-translate-y-0.5"
+            className={`bg-morayo-surface border-[1.5px] border-morayo-crimson rounded-[18px] px-7 py-8 relative transition-all duration-250 ease-in-out cursor-pointer ${
+              currentTier?.startsWith('monthly') 
+              ? 'opacity-50 grayscale-[0.5] pointer-events-none' 
+              : 'hover:-translate-y-0.5'
+            }`}
             onClick={() => selectPlan('monthly')}
           >
-            <div className="absolute -top-[11px] left-1/2 -translate-x-1/2 bg-morayo-crimson text-white text-[10px] px-3 py-[5px] rounded-full tracking-[1.2px] font-medium">
-              MOST POPULAR
-            </div>
+            {currentTier?.startsWith('monthly') ? (
+              <div className="absolute -top-[11px] left-1/2 -translate-x-1/2 bg-gray-400 text-white text-[10px] px-3 py-[5px] rounded-full tracking-[1.2px] font-medium">
+                CURRENT PLAN
+              </div>
+            ) : (
+              <div className="absolute -top-[11px] left-1/2 -translate-x-1/2 bg-morayo-crimson text-white text-[10px] px-3 py-[5px] rounded-full tracking-[1.2px] font-medium">
+                MOST POPULAR
+              </div>
+            )}
             <div className="text-[11px] text-morayo-crimson tracking-[1.8px] mb-[18px] font-medium">MONTHLY</div>
             <div className="flex items-baseline gap-1 mb-1">
               <span className="font-fraunces not-italic text-[44px] text-morayo-ink font-normal tracking-[-2px] leading-none">
@@ -157,9 +194,18 @@ const Subscription = () => {
 
           {/* Annual Plan */}
           <div 
-            className="bg-morayo-surface border border-morayo-hairline rounded-[18px] px-7 py-8 relative transition-all duration-250 ease-in-out cursor-pointer hover:border-morayo-ink hover:-translate-y-0.5"
+            className={`bg-morayo-surface border border-morayo-hairline rounded-[18px] px-7 py-8 relative transition-all duration-250 ease-in-out cursor-pointer ${
+              currentTier?.startsWith('annual') 
+              ? 'opacity-50 grayscale-[0.5] pointer-events-none' 
+              : 'hover:border-morayo-ink hover:-translate-y-0.5'
+            }`}
             onClick={() => selectPlan('annual')}
           >
+            {currentTier?.startsWith('annual') && (
+              <div className="absolute -top-[11px] left-1/2 -translate-x-1/2 bg-gray-400 text-white text-[10px] px-3 py-[5px] rounded-full tracking-[1.2px] font-medium">
+                CURRENT PLAN
+              </div>
+            )}
             <div className="text-[11px] text-morayo-muted-2 tracking-[1.8px] mb-[18px] font-medium">ANNUAL</div>
             <div className="flex items-baseline gap-1 mb-1">
               <span className="font-fraunces not-italic text-[44px] text-morayo-ink font-normal tracking-[-2px] leading-none">

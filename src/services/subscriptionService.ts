@@ -47,4 +47,13 @@ export class SubscriptionService {
         return (res as any)?.token;
     }
 
+    static async getBillingHistory() {
+        const response = await apiClient.get('/subscriptions/billing-history');
+        return response;
+    }
+
+    static async cancelSubscription() {
+        const response = await apiClient.post('/subscriptions/cancel');
+        return response;
+    }
 }
