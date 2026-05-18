@@ -1,7 +1,7 @@
 
 export function SecuritySettings({ onPasswordChange }: { onPasswordChange: () => void }) {
   return (
-    <div className="bg-white border border-gray-100 rounded-[24px] overflow-hidden shadow-sm h-ull">
+    <div className="bg-white border border-gray-100 rounded-[24px] overflow-hidden h-ull">
       <div className="px-6 py-5 border-b border-gray-50">
         <h3 className="text-[15px] font-bold text-gray-900">Security</h3>
       </div>

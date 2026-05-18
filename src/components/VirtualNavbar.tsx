@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, NavLink } from "react-router-dom";
 import { AuthService } from "../services/authService";
 import { Menu, X } from "lucide-react";
 
@@ -27,8 +27,39 @@ const VirtualNavbar = () => {
         </div>
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-6">
-          <div className="flex gap-1 bg-white/4 border border-white/8 rounded-full p-[3px]">
+          <div className="flex gap-1 bg-white/10 border border-white/10 rounded-full p-[3px]">
+            <NavLink
+              to="https://themorayoshow.com/"
+              className={`px-5 py-2 text-[13px] font-medium rounded-full transition-all `}
+            >
+              Home
+            </NavLink>
+            <NavLink
+              to="https://themorayoshow.com/meet-morayo/"
+              className={`px-5 py-2 text-[13px] font-medium rounded-full transition-all `}
+            >
+              Meet Morayo
+            </NavLink>
+            <NavLink
+              to="https://themorayoshow.com/join-us/"
+              className={`px-5 py-2 text-[13px] font-medium rounded-full transition-all `}
+            >
+              Join Us
+            </NavLink>
+            <NavLink
+              to="https://themorayoshow.com/contact"
+              className={`px-5 py-2 text-[13px] font-medium rounded-full transition-all `}
+            >
+              Contact
+            </NavLink>
           </div>
+
+          {/* Dashboards */}
+          {authenticated && (
+            <Link to="/member" className="text-[13px] font-medium transition-colors underline underline-offset-4">
+              Dashboard
+            </Link>
+          )}
 
           <button
             onClick={handleAuthAction}

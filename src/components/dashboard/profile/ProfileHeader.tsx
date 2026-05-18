@@ -1,4 +1,3 @@
-import { Sparkles } from 'lucide-react';
 import { getGravatarUrl } from '../../../utils/user';
 
 interface ProfileHeaderProps {
@@ -24,7 +23,6 @@ export default function ProfileHeader({ user, subscription }: ProfileHeaderProps
         <p className="text-gray-400 font-medium text-[14px] mb-4">{user?.email}</p>
 
         <div className="inline-flex items-center gap-2 bg-[#F8F8F6] border border-gray-100 px-4 py-1.5 rounded-full">
-          <Sparkles className="w-3.5 h-3.5 text-[#E8593C]" />
           <span className="text-[11px] font-bold text-gray-600 uppercase tracking-[1px]">
             {subscription?.tier?.split('_')[0] || 'Free'} member · Season 4
           </span>

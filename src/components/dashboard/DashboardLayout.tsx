@@ -1,7 +1,8 @@
-import React, { useState, useEffect, createContext, useContext } from 'react';
+import React, { useState, useEffect, createContext, useContext, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthService } from '../../services/authService';
 import { SubscriptionService } from '../../services/subscriptionService';
+import { NotificationService } from '../../services/notificationService';
 import Sidebar from './Sidebar';
 import TopBar from './TopBar';
 import NotificationModal from './NotificationModal';
@@ -12,6 +13,12 @@ interface DashboardContextType {
   subscription: any;
   loading: boolean;
   refreshStatus: () => Promise<void>;
+  notifications: any[];
+  unreadCount: number;
+  markAllRead: () => Promise<void>;
+  markAsRead: (id: string) => Promise<void>;
+  clearAll: () => Promise<void>;
+  fetchNotifications: () => Promise<void>;
 }
 
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
@@ -28,6 +35,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [subscription, setSubscription] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   
+  // Notification states
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const pollingInterval = useRef<any>(null);
+
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -51,14 +63,68 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
   };
 
+  const fetchNotifications = async () => {
+    try {
+      const res = await NotificationService.getNotifications({ limit: 10 });
+      if (res.success) {
+        setNotifications(res.data.notifications);
+        setUnreadCount(res.data.notifications.filter((n: any) => !n.isRead).length);
+      }
+    } catch (err) {
+      console.error("Failed to fetch notifications:", err);
+    }
+  };
+
+  const markAllRead = async () => {
+    try {
+      const res = await NotificationService.markAllAsRead();
+      if (res.success) {
+        setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+        setUnreadCount(0);
+      }
+    } catch (err) {
+      console.error("Failed to mark all read:", err);
+    }
+  };
+
+  const markAsRead = async (id: string) => {
+    try {
+      await NotificationService.markAsRead(id);
+      setNotifications(prev => prev.map(n => n._id === id ? { ...n, isRead: true } : n));
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    } catch (err) {
+      console.error("Failed to mark read:", err);
+    }
+  };
+
+  const clearAll = async () => {
+    try {
+      const res = await NotificationService.clearAll();
+      if (res.success) {
+        setNotifications([]);
+        setUnreadCount(0);
+      }
+    } catch (err) {
+      console.error("Failed to clear all:", err);
+    }
+  };
+
   useEffect(() => {
     const profile = AuthService.getUserProfile();
     if (profile) {
       setUser(profile);
       fetchStatus(profile.email);
+      fetchNotifications();
+      
+      // Background polling every 5 minutes
+      pollingInterval.current = setInterval(fetchNotifications, 5 * 60 * 1000);
     } else {
       navigate('/login');
     }
+
+    return () => {
+      if (pollingInterval.current) clearInterval(pollingInterval.current);
+    };
   }, []);
 
   const refreshStatus = async () => {
@@ -67,6 +133,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       if (res?.success && res.data) {
         setUser(res.data);
         await fetchStatus(res.data.email);
+        await fetchNotifications();
       }
     } catch (err) {
       console.error("Refresh failed:", err);
@@ -84,7 +151,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <DashboardContext.Provider value={{ user, subscription, loading, refreshStatus }}>
+    <DashboardContext.Provider value={{ 
+      user, 
+      subscription, 
+      loading, 
+      refreshStatus,
+      notifications,
+      unreadCount,
+      markAllRead,
+      markAsRead,
+      clearAll,
+      fetchNotifications
+    }}>
       <div className="min-h-screen bg-[#F9FAFB] flex font-sans antialiased text-gray-900">
         <Sidebar 
           user={user} 

@@ -1,4 +1,4 @@
-import { ArrowRight } from 'lucide-react';
+// import { ArrowRight } from 'lucide-react';
 import { DateTime } from 'luxon';
 
 interface UpcomingShowsListProps {
@@ -10,9 +10,9 @@ export default function UpcomingShowsList({ nextEvents }: UpcomingShowsListProps
     <div className="space-y-3 pt-4">
       <div className="flex justify-between items-center">
         <h4 className="text-[15px] font-bold text-gray-900">Upcoming shows</h4>
-        <button className="text-[13px] font-bold text-gray-400 hover:text-gray-900 transition-colors flex items-center gap-1">
+        {/* <button className="text-[13px] font-bold text-gray-400 hover:text-gray-900 transition-colors flex items-center gap-1">
           View all <ArrowRight className="w-4 h-4" />
-        </button>
+        </button> */}
       </div>
 
       <div className="space-y- bg-white border border-gray-100 rounded-2xl divide-y divide-gray-100">

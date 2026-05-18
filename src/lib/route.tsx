@@ -1,6 +1,7 @@
 import SeatReservationPage from "@/pages/SeatReservation";
 import BookingTicket from "@/pages/BookingTicket";
 import VerifyEmail from "@/pages/VerifyEmail";
+import BookingVerify from "@/pages/BookingVerify";
 import CancelReservation from "@/pages/CancelReservation";
 import Subscription from "@/pages/Subscription";
 import MemberDashboard from "@/pages/MemberDashboard";
@@ -42,7 +43,7 @@ export const reservationRoutes: CustomRouteObject[] = [
     },
     {
         path: ROUTES.VERIFY,
-        element: <VerifyEmail />,
+        element: <BookingVerify />,
     },
     {
         path: ROUTES.CANCEL,

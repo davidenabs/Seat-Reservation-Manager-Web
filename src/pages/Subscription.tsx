@@ -12,6 +12,10 @@ const Subscription = () => {
   const [currency, setCurrency] = useState<'NGN' | 'USD'>('NGN');
   const [currentTier, setCurrentTier] = useState<string | null>(null);
 
+  // if the url has redirect=dashboard, and  redirect to dashboard after successful payment
+  // const urlParams = new URLSearchParams(window.location.search);
+  // const redirect = urlParams.get('redirect');
+
   useEffect(() => {
     const fetchCurrentPlan = async () => {
       const user = AuthService.getUserProfile();
@@ -21,6 +25,10 @@ const Subscription = () => {
           if (res?.success && res.data?.subscription) {
             setCurrentTier(res.data.subscription.tier);
           }
+          // if (redirect === 'dashboard') {
+          //   // toast.success(`Payment successful`);
+          //   navigate('/member');
+          // }
         } catch (err) {
           console.error("Failed to fetch current plan:", err);
         }
@@ -32,48 +40,48 @@ const Subscription = () => {
   const selectPlan = async (plan: string) => {
     const user = AuthService.getUserProfile();
     if (!user) {
-        toast.error("Please log in to subscribe");
-        navigate('/login');
-        return;
+      toast.error("Please log in to subscribe");
+      navigate('/login');
+      return;
     }
 
     setLoading(true);
     toast.loading(`Initializing secure checkout...`, { id: 'payment-toast' });
 
     try {
-        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        let response;
-        if (currency === 'NGN') {
-            response = await SubscriptionService.initializePaystack(user.email, user.id, plan, timezone);
-        } else {
-            response = await SubscriptionService.initializeStripe(user.email, user.id, plan, timezone);
-        }
-        
-        if (response.success && response.data) {
-            toast.success(`Redirecting to payment gateway...`, { id: 'payment-toast' });
-            // Redirect to Stripe Checkout or Paystack URL
-            const redirectUrl = response.data.authorizationUrl || response.data.url;
-            if (redirectUrl) {
-                window.location.href = redirectUrl;
-            } else {
-                toast.error("Failed to retrieve checkout session", { id: 'payment-toast' });
-            }
-        } else {
-            toast.error(response.message || "Payment initialization failed", { id: 'payment-toast' });
-            setLoading(false);
-        }
-    } catch (error: any) {
-        const status = error.response?.status;
-        const message = error.response?.data?.message;
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      let response;
+      if (currency === 'NGN') {
+        response = await SubscriptionService.initializePaystack(user.email, user.id, plan, timezone);
+      } else {
+        response = await SubscriptionService.initializeFlutterwave(user.email, user.id, plan, timezone);
+      }
 
-        if (status === 409) {
-            // User already has this plan active — send them to their dashboard
-            toast.error(message || "You already have this plan active.", { id: 'payment-toast' });
-            setTimeout(() => navigate('/member'), 1500);
+      if (response.success && response.data) {
+        toast.success(`Redirecting to payment gateway...`, { id: 'payment-toast' });
+        // Redirect to Stripe Checkout or Paystack URL
+        const redirectUrl = response.data.authorizationUrl || response.data.url;
+        if (redirectUrl) {
+          window.location.href = redirectUrl;
         } else {
-            toast.error(message || "An error occurred during checkout initialization", { id: 'payment-toast' });
+          toast.error("Failed to retrieve checkout session", { id: 'payment-toast' });
         }
+      } else {
+        toast.error(response.message || "Payment initialization failed", { id: 'payment-toast' });
         setLoading(false);
+      }
+    } catch (error: any) {
+      const status = error.response?.status;
+      const message = error.response?.data?.message;
+
+      if (status === 409) {
+        // User already has this plan active — send them to their dashboard
+        toast.error(message || "You already have this plan active.", { id: 'payment-toast' });
+        setTimeout(() => navigate('/member'), 1500);
+      } else {
+        toast.error(message || "An error occurred during checkout initialization", { id: 'payment-toast' });
+      }
+      setLoading(false);
     }
   };
 
@@ -94,33 +102,32 @@ const Subscription = () => {
         </p>
 
         <div className="flex justify-center mb-10">
-            <div className="inline-flex bg-morayo-surface border border-morayo-hairline rounded-full p-1">
-                <button 
-                    onClick={() => setCurrency('NGN')}
-                    className={`px-6 py-2 rounded-full text-[13px] font-medium transition-all ${currency === 'NGN' ? 'bg-morayo-ink text-white shadow-md' : 'text-morayo-muted hover:text-morayo-ink'}`}
-                >
-                    NGN (₦)
-                </button>
-                <button 
-                    onClick={() => setCurrency('USD')}
-                    className={`px-6 py-2 rounded-full text-[13px] font-medium transition-all ${currency === 'USD' ? 'bg-morayo-ink text-white shadow-md' : 'text-morayo-muted hover:text-morayo-ink'}`}
-                >
-                    USD ($)
-                </button>
-            </div>
+          <div className="inline-flex bg-morayo-surface border border-morayo-hairline rounded-full p-1">
+            <button
+              onClick={() => setCurrency('NGN')}
+              className={`px-6 py-2 rounded-full text-[13px] font-medium transition-all ${currency === 'NGN' ? 'bg-morayo-ink text-white shadow-md' : 'text-morayo-muted hover:text-morayo-ink'}`}
+            >
+              NGN (₦)
+            </button>
+            <button
+              onClick={() => setCurrency('USD')}
+              className={`px-6 py-2 rounded-full text-[13px] font-medium transition-all ${currency === 'USD' ? 'bg-morayo-ink text-white shadow-md' : 'text-morayo-muted hover:text-morayo-ink'}`}
+            >
+              USD ($)
+            </button>
+          </div>
         </div>
       </div>
 
       <div className="max-w-[980px] mx-auto px-4 md:px-8 pb-20">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          
+
           {/* Weekly Plan */}
-          <div 
-            className={`bg-morayo-surface border border-morayo-hairline rounded-[18px] px-7 py-8 relative transition-all duration-250 ease-in-out cursor-pointer ${
-              currentTier?.startsWith('weekly') 
-              ? 'opacity-50 grayscale-[0.5] pointer-events-none' 
-              : 'hover:border-morayo-ink hover:-translate-y-0.5'
-            }`}
+          <div
+            className={`bg-morayo-surface border border-morayo-hairline rounded-[18px] px-7 py-8 relative transition-all duration-250 ease-in-out cursor-pointer ${currentTier?.startsWith('weekly')
+                ? 'opacity-50 grayscale-[0.5] pointer-events-none'
+                : 'hover:border-morayo-ink hover:-translate-y-0.5'
+              }`}
             onClick={() => selectPlan('weekly')}
           >
             {currentTier?.startsWith('weekly') && (
@@ -152,12 +159,11 @@ const Subscription = () => {
           </div>
 
           {/* Monthly Plan (Featured) */}
-          <div 
-            className={`bg-morayo-surface border-[1.5px] border-morayo-crimson rounded-[18px] px-7 py-8 relative transition-all duration-250 ease-in-out cursor-pointer ${
-              currentTier?.startsWith('monthly') 
-              ? 'opacity-50 grayscale-[0.5] pointer-events-none' 
-              : 'hover:-translate-y-0.5'
-            }`}
+          <div
+            className={`bg-morayo-surface border-[1.5px] border-morayo-crimson rounded-[18px] px-7 py-8 relative transition-all duration-250 ease-in-out cursor-pointer ${currentTier?.startsWith('monthly')
+                ? 'opacity-50 grayscale-[0.5] pointer-events-none'
+                : 'hover:-translate-y-0.5'
+              }`}
             onClick={() => selectPlan('monthly')}
           >
             {currentTier?.startsWith('monthly') ? (
@@ -193,12 +199,11 @@ const Subscription = () => {
           </div>
 
           {/* Annual Plan */}
-          <div 
-            className={`bg-morayo-surface border border-morayo-hairline rounded-[18px] px-7 py-8 relative transition-all duration-250 ease-in-out cursor-pointer ${
-              currentTier?.startsWith('annual') 
-              ? 'opacity-50 grayscale-[0.5] pointer-events-none' 
-              : 'hover:border-morayo-ink hover:-translate-y-0.5'
-            }`}
+          <div
+            className={`bg-morayo-surface border border-morayo-hairline rounded-[18px] px-7 py-8 relative transition-all duration-250 ease-in-out cursor-pointer ${currentTier?.startsWith('annual')
+                ? 'opacity-50 grayscale-[0.5] pointer-events-none'
+                : 'hover:border-morayo-ink hover:-translate-y-0.5'
+              }`}
             onClick={() => selectPlan('annual')}
           >
             {currentTier?.startsWith('annual') && (

@@ -1,8 +1,6 @@
-import { useState, useEffect } from 'react';
 import { X, Info, Calendar, CreditCard, Loader2, BellOff, Trash2 } from 'lucide-react';
-import { NotificationService } from '../../services/notificationService';
+import { useDashboard } from './DashboardLayout';
 import { formatRelativeTime } from '../../utils/formatDate';
-import { toast } from 'sonner';
 
 interface NotificationModalProps {
   isOpen: boolean;
@@ -10,62 +8,13 @@ interface NotificationModalProps {
 }
 
 export default function NotificationModal({ isOpen, onClose }: NotificationModalProps) {
-  const [notifications, setNotifications] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (isOpen) {
-      fetchNotifications();
-    }
-  }, [isOpen]);
-
-  const fetchNotifications = async () => {
-    setLoading(true);
-    try {
-      const res = await NotificationService.getNotifications({ limit: 10 });
-      if (res.success) {
-        setNotifications(res.data.notifications);
-      }
-    } catch (err) {
-      console.error("Failed to fetch notifications:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const markAllRead = async () => {
-    try {
-      const res = await NotificationService.markAllAsRead();
-      if (res.success) {
-        setNotifications(notifications.map(n => ({ ...n, isRead: true })));
-        toast.success("All marked as read");
-      }
-    } catch (err) {
-      toast.error("Failed to mark all as read");
-    }
-  };
-
-  const handleClearAll = async () => {
-    if (!window.confirm("Clear all notifications?")) return;
-    try {
-      const res = await NotificationService.clearAll();
-      if (res.success) {
-        setNotifications([]);
-        toast.success("Notifications cleared");
-      }
-    } catch (err) {
-      toast.error("Failed to clear notifications");
-    }
-  };
-
-  const markRead = async (id: string) => {
-    try {
-      await NotificationService.markAsRead(id);
-      setNotifications(notifications.map(n => n._id === id ? { ...n, isRead: true } : n));
-    } catch (err) {
-      console.error("Failed to mark read:", err);
-    }
-  };
+  const { 
+    notifications, 
+    markAllRead, 
+    markAsRead, 
+    clearAll,
+    loading: dashboardLoading 
+  } = useDashboard();
 
   if (!isOpen) return null;
 
@@ -91,7 +40,7 @@ export default function NotificationModal({ isOpen, onClose }: NotificationModal
           <div className="flex items-center gap-1">
             {notifications.length > 0 && (
               <button 
-                onClick={handleClearAll}
+                onClick={clearAll}
                 className="p-1.5 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-full transition-colors group"
                 title="Clear all"
               >
@@ -105,7 +54,7 @@ export default function NotificationModal({ isOpen, onClose }: NotificationModal
         </div>
 
         <div className="max-h-[400px] overflow-y-auto">
-          {loading ? (
+          {dashboardLoading && notifications.length === 0 ? (
             <div className="py-12 flex flex-col items-center justify-center text-gray-400 gap-3">
               <Loader2 className="w-8 h-8 animate-spin" />
               <p className="text-[13px] font-medium">Loading notifications...</p>
@@ -127,7 +76,7 @@ export default function NotificationModal({ isOpen, onClose }: NotificationModal
                 return (
                   <div 
                     key={notif._id} 
-                    onClick={() => markRead(notif._id)}
+                    onClick={() => markAsRead(notif._id)}
                     className={`p-4 hover:bg-gray-50/50 transition-colors cursor-pointer flex gap-3 relative group ${!notif.isRead ? 'bg-blue-50/20' : ''}`}
                   >
                     {!notif.isRead && (

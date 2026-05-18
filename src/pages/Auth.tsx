@@ -5,6 +5,7 @@ import { AuthLeftPanel } from '../components/auth/AuthLeftPanel';
 import { AuthTabs } from '../components/auth/AuthTabs';
 import { LoginForm } from '../components/auth/LoginForm';
 import { RegisterForm } from '../components/auth/RegisterForm';
+import { AuthService } from '../services/authService';
 
 export default function Auth() {
     const location = useLocation();
@@ -13,6 +14,14 @@ export default function Auth() {
     const [activeTab, setActiveTab] = useState<'login' | 'register'>(
         location.pathname === ROUTES.REGISTER ? 'register' : 'login'
     );
+
+    // Redirect if already authenticated
+    useEffect(() => {
+        if (AuthService.isAuthenticated()) {
+            const from = (location.state as any)?.from || '/member';
+            navigate(from, { replace: true });
+        }
+    }, [navigate, location]);
 
     // Update active tab based on route changes
     useEffect(() => {

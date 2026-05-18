@@ -89,7 +89,7 @@ const Profile = () => {
   };
 
   return (
-    <div className="p-4 md:p-8 flex-1">
+    <div className="p-4 md:p-8">
       <div className="mb-8">
         <h2 className="text-lg font-bold text-gray-900">Profile</h2>
       </div>
@@ -97,27 +97,25 @@ const Profile = () => {
       <ProfileHeader user={user} subscription={subscription} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="space-y-8">
-          <AccountDetails
-            user={user}
-            onEdit={() => openModal('edit')}
-          />
-          <NotificationSettings
-            preferences={preferences}
-            onEdit={() => openModal('notifications')}
-          />
-        </div>
+        <AccountDetails
+          user={user}
+          onEdit={() => openModal('edit')}
+        />
 
-        <div className="space-y-8">
-          <SubscriptionStatus
-            subscription={subscription}
-            onChangePlan={() => openModal('change_plan')}
-            onCancel={() => openModal('cancel')}
-          />
-          <div className="flex flex-col h-full">
-            <SecuritySettings onPasswordChange={() => openModal('password')} />
-            <DangerZone onDeleteAccount={() => openModal('delete')} />
-          </div>
+        <SubscriptionStatus
+          subscription={subscription}
+          onChangePlan={() => openModal('change_plan')}
+          onCancel={() => openModal('cancel')}
+        />
+
+        <NotificationSettings
+          preferences={preferences}
+          onEdit={() => openModal('notifications')}
+        />
+
+        <div className="flex flex-col">
+          <SecuritySettings onPasswordChange={() => openModal('password')} />
+          <DangerZone onDeleteAccount={() => openModal('delete')} />
         </div>
       </div>
 

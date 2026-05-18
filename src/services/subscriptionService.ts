@@ -16,6 +16,11 @@ export class SubscriptionService {
         return response;
     }
 
+    static async initializeFlutterwave(email: string, userId: string, plan: string, timezone: string) {
+        const response = await apiClient.post('/subscriptions/flutterwave/initialize', { email, userId, plan, timezone });
+        return response;
+    }
+
     static async getNextEvent() {
         const response = await apiClient.get('/events/next-event');
         return response;
@@ -47,8 +52,8 @@ export class SubscriptionService {
         return (res as any)?.token;
     }
 
-    static async getBillingHistory() {
-        const response = await apiClient.get('/subscriptions/billing-history');
+    static async getBillingHistory(page: number = 1, limit: number = 10) {
+        const response = await apiClient.get(`/subscriptions/billing-history?page=${page}&limit=${limit}`);
         return response;
     }
 

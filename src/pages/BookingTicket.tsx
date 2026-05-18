@@ -1,4 +1,4 @@
-import { Check, Download, Calendar, Info } from 'lucide-react';
+import { Check, Download, Calendar, Info, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +9,8 @@ import { toast } from 'sonner';
 import { ROUTES } from '@/config/route';
 import { formatDate } from '../utils/formatDate';
 import type { IOTPVerificationResponse } from '../intefaces/verification';
+
+const capitalizeFirstWord = (str: string) => str ? str.charAt(0).toUpperCase() + str.slice(1) : str;
 
 const defaultData = {
     // session: "The Morayo Show",
@@ -187,7 +189,7 @@ const BookingTicket = () => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-green-50 to-gray-50 flex items-center justify-center p-4">
             <div ref={ticketRef} data-ticket-ref className="w-full max-w-7xl">
-                <Card className="w-full max-w-7xl border-0 border-t-3 border-t-green-500 shadow-none">
+                <Card className={`w-full max-w-7xl border-0 border-t-3 shadow-none ${bookingDetails?.status === 'waitlisted' ? 'border-t-amber-500' : 'border-t-green-500'}`}>
                     {/* Header with Logo */}
                     <div className="text-center mb-8">
                         <div className="inline-flex items-center justify-center mb-6">
@@ -201,15 +203,21 @@ const BookingTicket = () => {
                         {/* Left Column - Session Summary */}
                         <div className="lg:col-span-2">
 
-                            <Card className=" border-0 border-t-3 border-t-green-500 shadow-none 0">
+                            <Card className={`border-0 border-t-3 shadow-none 0 ${bookingDetails?.status === 'waitlisted' ? 'border-t-amber-500' : 'border-t-green-500'}`}>
                                 <CardHeader className='text-center'>
-                                    {/* Success Animation */}
+                                    {/* Success/Waitlist Animation */}
                                     <div className="mb-6">
-                                        <div className="inline-flex items-center justify-center w-16 h-16 bg-green-500 rounded-full mb-4 animate-pulse">
-                                            <Check className="w-8 h-8 text-white" />
+                                        <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 animate-pulse ${bookingDetails?.status === 'waitlisted' ? 'bg-amber-500' : 'bg-green-500'}`}>
+                                            {bookingDetails?.status === 'waitlisted' ? <Clock className="w-8 h-8 text-white" /> : <Check className="w-8 h-8 text-white" />}
                                         </div>
-                                        <h1 className="text-xl font-bold text-gray-800 mb-">Booking Successful!</h1>
-                                        <p className="text-gray-600 text-sm">Your seat has been reserved successfully</p>
+                                        <h1 className="text-xl font-bold text-gray-800 mb-">
+                                            {bookingDetails?.status === 'waitlisted' ? "You're on the Waiting List!" : "Booking Successful!"}
+                                        </h1>
+                                        <p className="text-gray-600 text-sm">
+                                            {bookingDetails?.status === 'waitlisted' 
+                                                ? "The general allocation is currently full. We'll notify you if a seat becomes available."
+                                                : "Your seat has been reserved successfully"}
+                                        </p>
                                     </div>
                                 </CardHeader>
                                 <CardContent >
@@ -242,10 +250,12 @@ const BookingTicket = () => {
                                                 <span className="text-gray-600">{defaultData.liveShow}</span>
                                             </div>
 
-                                            {/* <div className="flex justify-between items-center py-1 border-gray-100">
+                                            <div className="flex justify-between items-center py-1 border-gray-100">
                                                 <span className="text-gray-600 font-medium">Status</span>
-                                                <span className="text-gray-600">{bookingDetails?.status ? capitalizeFirstWord(bookingDetails.status) : '—'}</span>
-                                            </div> */}
+                                                <Badge variant="secondary" className={`font-bold ${bookingDetails?.status === 'waitlisted' ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800'}`}>
+                                                    {capitalizeFirstWord(bookingDetails?.status || 'confirmed')}
+                                                </Badge>
+                                            </div>
 
                                             <div className="flex justify-between items-center py-1 border-gray-100">
                                                 <span className="text-gray-600 font-medium">Seat</span>

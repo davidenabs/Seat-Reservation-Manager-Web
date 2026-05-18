@@ -79,7 +79,8 @@ const SeatReservationPage = () => {
         queryClient.invalidateQueries({ queryKey: ["seats"] });
         toast.success(data.message || "Reservation successful!");
 
-        // storge booking in the booking_details
+        // storage booking in the booking_details
+        // const detailsToStore = data.data ? { ...data.data, success: data.success, message: data.message } : data;
         localStorage.setItem("booking_details", JSON.stringify(data));
 
         // Reset form and go to success page
@@ -148,6 +149,8 @@ const SeatReservationPage = () => {
           onClick={() => {
             if (currentStep === 1) {
               // Navigate to home page
+              // go to https://themorayoshow.com/
+              window.location.href = "https://themorayoshow.com/";
             } else {
               setCurrentStep(1);
             }

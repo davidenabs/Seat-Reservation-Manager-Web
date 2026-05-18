@@ -2,6 +2,7 @@ import { Bell, Menu } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { getGravatarUrl } from '../../utils/user';
 import { ROUTES } from '../../config/route';
+import { useDashboard } from './DashboardLayout';
 
 interface TopBarProps {
   user: any;
@@ -12,6 +13,7 @@ interface TopBarProps {
 
 export default function TopBar({ user, onNotificationClick, onProfileClick, onMenuClick }: TopBarProps) {
   const location = useLocation();
+  const { unreadCount } = useDashboard();
   const gravatarUrl = getGravatarUrl(user?.email, 80);
 
   const getHeaderInfo = () => {
@@ -53,7 +55,9 @@ export default function TopBar({ user, onNotificationClick, onProfileClick, onMe
           className="relative w-10 h-10 flex items-center justify-center rounded-full bg-white border border-gray-100 text-gray-500 hover:bg-gray-50 transition-colors"
         >
           <Bell className="w-5 h-5" />
-          <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 border-2 border-white rounded-full"></span>
+          {unreadCount > 0 && (
+            <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 border-2 border-white rounded-full"></span>
+          )}
         </button>
 
         {/* Profile Avatar */}
