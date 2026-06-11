@@ -51,7 +51,7 @@ export const RegisterForm: React.FC = () => {
                 toast.error(res.message || 'Registration failed');
             }
         } catch (err: any) {
-            toast.error(err.response?.data?.message || 'Error occurred');
+            toast.error(err?.message || err.response?.data?.message || 'Error occurred');
         } finally {
             setLoading(false);
         }

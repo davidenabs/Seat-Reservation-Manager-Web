@@ -67,7 +67,7 @@ export default function VerifyEmail() {
                 toast.error(res.message || 'Verification failed');
             }
         } catch (err: any) {
-            toast.error(err.response?.data?.message || 'Verification failed');
+            toast.error(err?.message || err.response?.data?.message || 'Verification failed');
         } finally {
             setLoading(false);
         }
@@ -85,7 +85,7 @@ export default function VerifyEmail() {
                 inputRefs.current[0]?.focus();
             }
         } catch (err: any) {
-            toast.error(err.response?.data?.message || 'Failed to resend code');
+            toast.error(err?.message || err.response?.data?.message || 'Failed to resend code');
         }
     };
 

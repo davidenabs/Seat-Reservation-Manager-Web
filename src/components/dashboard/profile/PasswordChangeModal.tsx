@@ -62,7 +62,7 @@ export default function PasswordChangeModal({ isOpen, onClose, user }: PasswordC
         toast.error(res.message || "Failed to change password");
       }
     } catch (err: any) {
-      // toast.error(err.response?.data?.message || "Password change failed");
+      // toast.error(err?.message || err.response?.data?.message  || "Password change failed");
     } finally {
       setLoading(false);
     }
@@ -72,7 +72,7 @@ export default function PasswordChangeModal({ isOpen, onClose, user }: PasswordC
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[2000] flex items-center justify-center p-4">
       <div className="bg-white rounded-[32px] max-w-md w-full p-8 md:p-10 shadow-2xl animate-in zoom-in-95 duration-300 relative">
         <button onClick={onClose} className="absolute top-6 right-6 text-gray-300 hover:text-gray-900"><X className="w-5 h-5" /></button>
-        
+
         <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-6">
           <Lock className="w-8 h-8 text-gray-900" />
         </div>

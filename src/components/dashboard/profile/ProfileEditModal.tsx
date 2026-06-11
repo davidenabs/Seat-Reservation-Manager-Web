@@ -23,7 +23,7 @@ export default function ProfileEditModal({ isOpen, onClose, user, onSuccess }: P
     if (user && isOpen) {
       setName(user.name || '');
       setCountry(user.country || 'Nigeria');
-      
+
       // Parse phone if possible
       const rawPhone = user.phone || '';
       if (rawPhone.startsWith('+')) {
@@ -56,7 +56,7 @@ export default function ProfileEditModal({ isOpen, onClose, user, onSuccess }: P
         toast.error(res.message || "Update failed");
       }
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Failed to update profile");
+      toast.error(err?.message || err.response?.data?.message || "Failed to update profile");
     } finally {
       setLoading(false);
     }
@@ -65,7 +65,7 @@ export default function ProfileEditModal({ isOpen, onClose, user, onSuccess }: P
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[2000] flex items-center justify-center p-4">
       <div className="bg-white rounded-[32px] max-w-lg w-full p-8 md:p-10 shadow-2xl animate-in zoom-in-95 duration-300 relative">
-        <button 
+        <button
           onClick={onClose}
           className="absolute top-6 right-6 text-gray-300 hover:text-gray-900 transition-colors"
         >

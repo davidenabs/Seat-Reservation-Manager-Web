@@ -35,7 +35,7 @@ export default function UserForgotPassword() {
                 toast.error(res.message || 'Action failed');
             }
         } catch (err: any) {
-            toast.error(err.response?.data?.message || 'Internal routing error');
+            toast.error(err?.message || err?.message || err.response?.data?.message || 'Internal routing error');
         } finally {
             setLoading(false);
         }
@@ -57,15 +57,15 @@ export default function UserForgotPassword() {
                 {/* Right Panel - Auth Content */}
                 <div className="flex-1 flex flex-col items-center justify-center py-8">
                     <div className="w-full max-w-[460px]">
-                        
+
                         {/* Page Heading */}
                         <div className="mb-8 text-center lg:text-left">
                             <h1 className="font-fraunces italic text-[36px] font-light leading-tight mb-2">
                                 {sent ? 'Check your inbox.' : 'Reset access.'}
                             </h1>
                             <p className="text-gray-500 text-[15px]">
-                                {sent 
-                                    ? `We've emailed instructions to ${email}.` 
+                                {sent
+                                    ? `We've emailed instructions to ${email}.`
                                     : 'Provide your account email below to recover your account.'}
                             </p>
                         </div>
@@ -75,8 +75,8 @@ export default function UserForgotPassword() {
                                 <Link to="/login" className="w-full py-4 bg-[#E8593C] text-white font-medium text-center text-[15px] rounded-xl transition-all shadow-lg shadow-[#E8593C]/20 hover:bg-[#D14920]">
                                     Back to Login
                                 </Link>
-                                <button 
-                                    onClick={() => setSent(false)} 
+                                <button
+                                    onClick={() => setSent(false)}
                                     disabled={countdown > 0}
                                     className={`text-[14px] font-medium transition-colors ${countdown > 0 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:text-[#E8593C]'}`}
                                 >

@@ -10,7 +10,7 @@ export default function UserResetPassword() {
     const [loading, setLoading] = useState(false);
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
-    
+
     const token = searchParams.get('token');
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -34,7 +34,7 @@ export default function UserResetPassword() {
                 toast.error(res.message || 'Update failed');
             }
         } catch (err: any) {
-            toast.error(err.response?.data?.message || 'Token expired or unauthorized');
+            toast.error(err?.message || err.response?.data?.message || 'Token expired or unauthorized');
         } finally {
             setLoading(false);
         }
@@ -56,7 +56,7 @@ export default function UserResetPassword() {
                 {/* Right Panel - Auth Content */}
                 <div className="flex-1 flex flex-col items-center justify-center py-8">
                     <div className="w-full max-w-[460px]">
-                        
+
                         {/* Page Heading */}
                         <div className="mb-8 text-center lg:text-left">
                             <h1 className="font-fraunces italic text-[36px] font-light leading-tight mb-2">

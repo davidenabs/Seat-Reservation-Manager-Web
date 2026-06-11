@@ -28,7 +28,7 @@ export const LoginForm: React.FC = () => {
                 toast.error(res.message || 'Authentication failed');
             }
         } catch (err: any) {
-            toast.error(err.response?.data?.message || 'Login failed');
+            toast.error(err?.message || err.response?.data?.message || 'Login failed');
         } finally {
             setLoading(false);
         }
@@ -53,13 +53,13 @@ export const LoginForm: React.FC = () => {
         <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-1.5">
                 <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Email Address</label>
-                <input 
-                    type="email" 
-                    value={email} 
-                    onChange={e => setEmail(e.target.value)} 
-                    className="w-full bg-[#F8F8F6] rounded-xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-[#E8593C]/20 transition-all" 
-                    placeholder="you@example.com" 
-                    required 
+                <input
+                    type="email"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    className="w-full bg-[#F8F8F6] rounded-xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-[#E8593C]/20 transition-all"
+                    placeholder="you@example.com"
+                    required
                 />
             </div>
 
@@ -69,13 +69,13 @@ export const LoginForm: React.FC = () => {
                     <Link to={ROUTES.FORGOT_PASSWORD} className="text-[11px] text-gray-400 hover:text-[#E8593C]">Forgot password?</Link>
                 </div>
                 <div className="relative">
-                    <input 
-                        type={showPassword ? 'text' : 'password'} 
-                        value={password} 
-                        onChange={e => setPassword(e.target.value)} 
-                        className="w-full bg-[#F8F8F6] rounded-xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-[#E8593C]/20" 
-                        placeholder="Your password" 
-                        required 
+                    <input
+                        type={showPassword ? 'text' : 'password'}
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
+                        className="w-full bg-[#F8F8F6] rounded-xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-[#E8593C]/20"
+                        placeholder="Your password"
+                        required
                     />
                     <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-5 top-1/2 -translate-y-1/2 text-[12px] font-medium text-gray-400">
                         {showPassword ? 'Hide' : 'Show'}
@@ -83,9 +83,9 @@ export const LoginForm: React.FC = () => {
                 </div>
             </div>
 
-            <button 
-                type="submit" 
-                disabled={loading} 
+            <button
+                type="submit"
+                disabled={loading}
                 className="w-full py-4 bg-[#E8593C] hover:bg-[#D14920] disabled:bg-[#E8593C]/50 text-white font-semibold rounded-xl transition-all shadow-xl shadow-[#E8593C]/10 flex items-center justify-center gap-2"
             >
                 {loading ? 'Processing...' : 'Sign in'}
@@ -98,9 +98,9 @@ export const LoginForm: React.FC = () => {
             </div>
 
             <div className="w-full flex justify-center">
-                <GoogleLogin 
-                    onSuccess={handleGoogleSuccess} 
-                    onError={() => toast.error('Google failed')} 
+                <GoogleLogin
+                    onSuccess={handleGoogleSuccess}
+                    onError={() => toast.error('Google failed')}
                     theme="outline" shape="pill" width="460px"
                 />
             </div>

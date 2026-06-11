@@ -83,7 +83,7 @@ class ApiClient {
               // toast.error('Access denied. You don\'t have permission for this action.');
               break;
             case 404:
-              toast.error('Resource not found.');
+              // toast.error('Resource not found.');
               break;
             case 422:
               // Validation errors - show the extracted message
@@ -93,7 +93,7 @@ class ApiClient {
               toast.error('Server error. Please try again later.');
               break;
             default:
-              toast.error(errorMessage || 'An unexpected error occurred.');
+              // toast.error(errorMessage || 'An unexpected error occurred.');
           }
 
           // Log error in development
