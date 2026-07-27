@@ -37,7 +37,7 @@ const HomePage = () => {
                             The Morayo Show Tour
                         </h1>
                         <p className="text-base text-gray-700 max-w-3xl leading-relaxed">
-                            Experience The Morayo Show live as it brings compelling conversations, inspiring guests, and unforgettable moments to audiences in Abuja and Ibadan.
+                            Experience The Morayo Show live as it brings compelling conversations, inspiring guests, and unforgettable moments to audiences in Lagos, Abuja, Ibadan and Many more.
                         </p>
                     </header>
 
