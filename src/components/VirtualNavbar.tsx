@@ -28,7 +28,7 @@ const VirtualNavbar = () => {
     <>
       <div className="fixed top-0 left-0 right-0 z-[1000] backdrop-blur-[20px] border-b border-white/8 px-5 md:px-10 py-4 flex justify-between items-center">
         <div className="">
-          <Link to="/">
+          <Link to="https://themorayoshow.com">
             <img src="/tmas-logo-dark.png" alt="TMAS Logo" className="h-12 object-contain" />
           </Link>
         </div>
