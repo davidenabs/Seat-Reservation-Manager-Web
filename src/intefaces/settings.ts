@@ -1,4 +1,6 @@
 export interface ISettings {
+  name: string;
+  featureImage?: string;
   reservationOpenDate: string;
   reservationCloseDate: string;
   defaultTotalSeats: number;

@@ -8,6 +8,13 @@ const VirtualNavbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const authenticated = AuthService.isAuthenticated();
 
+  const navLinks = [
+    { label: "Home", href: "https://themorayoshow.com/" },
+    { label: "Meet Morayo", href: "https://themorayoshow.com/meet-morayo/" },
+    { label: "Join Us", href: "https://themorayoshow.com/join-us/" },
+    { label: "Contact", href: "https://themorayoshow.com/contact" },
+  ];
+
   const handleAuthAction = () => {
     if (authenticated) {
       AuthService.logout();
@@ -28,30 +35,15 @@ const VirtualNavbar = () => {
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-6">
           <div className="flex gap-1 bg-white/10 border border-white/10 rounded-full p-[3px]">
-            <NavLink
-              to="https://themorayoshow.com/"
-              className={`px-5 py-2 text-[13px] font-medium rounded-full transition-all `}
-            >
-              Home
-            </NavLink>
-            <NavLink
-              to="https://themorayoshow.com/meet-morayo/"
-              className={`px-5 py-2 text-[13px] font-medium rounded-full transition-all `}
-            >
-              Meet Morayo
-            </NavLink>
-            <NavLink
-              to="https://themorayoshow.com/join-us/"
-              className={`px-5 py-2 text-[13px] font-medium rounded-full transition-all `}
-            >
-              Join Us
-            </NavLink>
-            <NavLink
-              to="https://themorayoshow.com/contact"
-              className={`px-5 py-2 text-[13px] font-medium rounded-full transition-all `}
-            >
-              Contact
-            </NavLink>
+            {navLinks.map((link, index) => (
+              <NavLink
+                key={index}
+                to={link.href}
+                className="px-5 py-2 text-[13px] font-medium rounded-full transition-all"
+              >
+                {link.label}
+              </NavLink>
+            ))}
           </div>
 
           {/* Dashboards */}
@@ -77,6 +69,35 @@ const VirtualNavbar = () => {
           {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
+
+      {/* Mobile Menu */}
+      {isMenuOpen && (
+        <div className="md:hidden fixed top-[80px] left-0 right-0 bg-white border-b border-gray-200 z-[999] p-5 flex flex-col gap-4 shadow-lg">
+          {navLinks.map((link, index) => (
+            <NavLink 
+              key={index} 
+              to={link.href} 
+              className="text-[15px] font-medium text-gray-800" 
+              onClick={() => setIsMenuOpen(false)}
+            >
+              {link.label}
+            </NavLink>
+          ))}
+          
+          {authenticated && (
+            <Link to="/member" className="text-[15px] font-medium text-gray-800 underline" onClick={() => setIsMenuOpen(false)}>
+              Dashboard
+            </Link>
+          )}
+
+          <button
+            onClick={handleAuthAction}
+            className="text-[15px] font-medium text-white bg-[#E8593C] px-6 py-3 rounded-full mt-2 w-full text-center transition-all duration-300"
+          >
+            {authenticated ? "Logout" : "Login"}
+          </button>
+        </div>
+      )}
     </>
   );
 };

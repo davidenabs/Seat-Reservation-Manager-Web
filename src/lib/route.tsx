@@ -18,11 +18,12 @@ import ZoomPortal from "@/pages/ZoomPortal";
 import type { CustomRouteObject } from "@/types/route.type";
 import { ROUTES } from "@/config/route";
 import RouteGuard from "@/components/RouteGuard";
+import HomePage from "@/pages/HomePage";
 
 export const reservationRoutes: CustomRouteObject[] = [
     {
         path: ROUTES.HOME,
-        element: <SeatReservationPage />,
+        element: <HomePage />,
     },
     {
         path: ROUTES.MEMBER,

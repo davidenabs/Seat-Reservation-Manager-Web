@@ -8,13 +8,14 @@ export class BookingService {
   /**
    * Fetch available seats for a specific date
    */
-  static async fetchAvailableSeats(date: string): Promise<ISeatsResponse> {
+  static async fetchAvailableSeats(date: string, hallId?: string): Promise<ISeatsResponse> {
     if (!date) {
       throw new Error('Date is required');
     }
 
     try {
-      const response = await apiClient.get<ISeatsResponse>(`/bookings/seats/${date}`);
+      const url = hallId ? `/bookings/seats/${date}?hallId=${hallId}` : `/bookings/seats/${date}`;
+      const response = await apiClient.get<ISeatsResponse>(url);
       return response.data!;
     } catch (error) {
       console.error('Error fetching available seats:', error);

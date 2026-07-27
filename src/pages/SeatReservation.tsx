@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { ChevronLeft, Ticket } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -12,16 +12,20 @@ import type { ReservationFormData } from "@/schemas/reservationSchema";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { BookingService } from "@/services/bookingService";
-import { useNavigate } from "react-router-dom";
+import { HallService, } from "@/services/hallService";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { ROUTES } from "@/config/route";
-import { SettingsService } from "@/services/settingsService";
 import type { IReservationPayload } from "@/intefaces/reservation";
 import type { ISeat } from "@/intefaces/seats";
+import type { ISettings } from "@/intefaces/settings";
 
 const SeatReservationPage = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedSeats, setSelectedSeats] = useState<ISeat[]>([]);
+  const [searchParams] = useSearchParams();
+  const initialHallId = searchParams.get("hallId") || "";
+  const [selectedHallId, setSelectedHallId] = useState<string>(initialHallId);
 
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -33,32 +37,42 @@ const SeatReservationPage = () => {
     error: seatsError,
     refetch: refetchSeats,
   } = useQuery({
-    queryKey: ["seats", selectedDate],
+    queryKey: ["seats", selectedDate, selectedHallId],
     queryFn: () => {
       const localDate = new Date(selectedDate);
       localDate.setMinutes(
         localDate.getMinutes() - localDate.getTimezoneOffset()
       );
       const formattedDate = localDate.toISOString().split("T")[0];
-      return BookingService.fetchAvailableSeats(formattedDate);
+      return BookingService.fetchAvailableSeats(formattedDate, selectedHallId);
     },
-    enabled: !!selectedDate,
+    enabled: !!selectedDate && !!selectedHallId,
     staleTime: 30000,
     gcTime: 300000,
   });
 
-  // Query for fetching settings
+  // Query for fetching halls
   const {
-    data: settings,
-    isLoading: isLoadingSettings,
-    error: settingsError,
-    refetch: refetchSettings,
+    data: halls,
+    isLoading: isLoadingHalls,
   } = useQuery({
-    queryKey: ["settings"],
-    queryFn: () => SettingsService.getSettings(),
-    staleTime: 30000,
-    gcTime: 300000,
+    queryKey: ["halls"],
+    queryFn: () => HallService.getHalls(),
   });
+
+  // Default to first hall if none selected
+  useEffect(() => {
+    if (halls && halls.length > 0 && !selectedHallId) {
+      setSelectedHallId(halls[0]._id);
+    }
+  }, [halls, selectedHallId]);
+
+  // Derive settings from the selected hall
+  const settings = useMemo(() => {
+    if (!halls || !selectedHallId) return undefined;
+    const hall = halls.find((h) => h._id === selectedHallId);
+    return hall as unknown as ISettings;
+  }, [halls, selectedHallId]);
 
   // Mutation for reserving seats
   const reservationMutation = useMutation({
@@ -128,6 +142,7 @@ const SeatReservationPage = () => {
       eventDate: localDate.toISOString(),
       seatNumbers: selectedSeats.map((s: ISeat) => s.number),
       seatLabels: selectedSeats.map((s: ISeat) => s.label),
+      hallId: selectedHallId,
       ...formData,
     };
 
@@ -150,7 +165,8 @@ const SeatReservationPage = () => {
             if (currentStep === 1) {
               // Navigate to home page
               // go to https://themorayoshow.com/
-              window.location.href = "https://themorayoshow.com/";
+              // window.location.href = "https://themorayoshow.com/";
+              navigate(ROUTES.HOME);
             } else {
               setCurrentStep(1);
             }
@@ -166,16 +182,27 @@ const SeatReservationPage = () => {
           <div className="space-y-6">
             {currentStep === 1 && (
               <>
-                <DateSelector
-                  selectedDate={selectedDate}
-                  onDateChange={setSelectedDate}
-                  isLoading={isLoadingSettings}
-                  error={settingsError}
-                  onRetry={refetchSettings}
-                  settings={settings!}
-                />
 
-                {selectedDate && (
+
+                {selectedHallId && settings && (
+                  <DateSelector
+                    selectedDate={selectedDate}
+                    onDateChange={setSelectedDate}
+                    isLoading={isLoadingHalls}
+                    error={null}
+                    onRetry={() => {}}
+                    settings={settings}
+                    halls={halls!}
+                    selectedHallId={selectedHallId}
+                    onHallChange={(val) => {
+                      setSelectedHallId(val);
+                      setSelectedDate(""); // reset date when hall changes
+                      setSelectedSeats([]); // reset seats
+                    }}
+                  />
+                )}
+
+                {selectedDate && selectedHallId && (
                   <>
                     <Card>
                       <CardHeader>
@@ -198,8 +225,8 @@ const SeatReservationPage = () => {
                           seats={seatsData?.allSeats || []}
                           selectedSeats={selectedSeats}
                           onSeatClick={handleSeatClick}
-                          isLoading={isLoadingSeats || isLoadingSettings}
-                          error={seatsError || settingsError}
+                          isLoading={isLoadingSeats || isLoadingHalls}
+                          error={seatsError}
                           onRetry={refetchSeats}
                           seatsData={seatsData}
                           settings={settings!}
@@ -228,6 +255,7 @@ const SeatReservationPage = () => {
                 selectedDate={selectedDate}
                 selectedSeats={selectedSeats}
                 validDates={[]} // Empty array since not needed for form
+                hallName={settings?.name}
                 onSubmit={handleFormSubmit}
                 isSubmitting={reservationMutation.isPending}
               />
