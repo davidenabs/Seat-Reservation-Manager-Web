@@ -27,6 +27,7 @@ interface ReservationFormProps {
   selectedDate: string;
   selectedSeats: Array<{ number: number; label: string }>;
   validDates: Array<{ value: string; label: string }>;
+  hallName?: string;
   onSubmit: (data: ReservationFormData) => void;
   isSubmitting: boolean;
 }
@@ -34,8 +35,9 @@ interface ReservationFormProps {
 const ReservationForm = ({
   selectedDate,
   selectedSeats,
+  hallName,
   onSubmit,
-  isSubmitting
+  isSubmitting = false
 }: ReservationFormProps) => {
   const form = useForm<ReservationFormData>({
     resolver: zodResolver(ReservationFormSchema),
@@ -75,9 +77,10 @@ const ReservationForm = ({
           <CardTitle className="text-[24px]">Ticket Summary</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
-          <p className="flex justify-between"><span>Date:</span> {formatSelectedDate(selectedDate)}</p>
-          <p className="flex justify-between"><span>Arrival:</span> 9:00AM</p>
-          <p className="flex justify-between"><span>Selected Seats:</span> {selectedSeats.map(s => s.label).join(', ')}</p>
+          {hallName && <p className="flex justify-between"><span>Location:</span> <span className="font-medium text-right">{hallName}</span></p>}
+          <p className="flex justify-between"><span>Date:</span> <span className="text-right">{formatSelectedDate(selectedDate)}</span></p>
+          <p className="flex justify-between"><span>Arrival:</span> <span className="text-right">9:00AM</span></p>
+          <p className="flex justify-between"><span>Selected Seats:</span> <span className="text-right">{selectedSeats.map(s => s.label).join(', ')}</span></p>
         </CardContent>
       </Card>
 

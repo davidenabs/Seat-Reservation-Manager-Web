@@ -10,6 +10,13 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { cn } from "@/lib/utils";
 import type { ISettings } from "@/intefaces/settings";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface DateSelectorProps {
   selectedDate: string;
@@ -18,6 +25,9 @@ interface DateSelectorProps {
   error: Error | null;
   onRetry: () => void;
   settings: ISettings | null;
+  halls: any[];
+  selectedHallId: string;
+  onHallChange: (id: string) => void;
 }
 
 // Helper: format date for display
@@ -39,6 +49,9 @@ const DateSelector = ({
   error,
   // onRetry,
   settings,
+  halls,
+  selectedHallId,
+  onHallChange,
 }: DateSelectorProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -129,8 +142,8 @@ const DateSelector = ({
     selectedDateObj
       ? selectedDateObj
       : getFirstEnabledDate
-      ? new Date(getFirstEnabledDate.getFullYear(), getFirstEnabledDate.getMonth(), 1)
-      : undefined;
+        ? new Date(getFirstEnabledDate.getFullYear(), getFirstEnabledDate.getMonth(), 1)
+        : undefined;
 
   // Handle calendar selection
   const handleDateSelect = (date: Date | undefined) => {
@@ -147,7 +160,28 @@ const DateSelector = ({
           Schedule
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
+        {halls && halls.length > 0 && (
+          <Select
+            value={selectedHallId}
+            onValueChange={(val) => {
+              onHallChange(val)
+             
+            }}
+          >
+            <SelectTrigger className="w-full h-[48px]">
+              <SelectValue placeholder="Select an Event Center" />
+            </SelectTrigger>
+            <SelectContent>
+              {halls.map((hall) => (
+                <SelectItem key={hall._id} value={hall._id}>
+                  {hall.name} - {hall.city}, {hall.state}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+
         <Popover open={isOpen} onOpenChange={setIsOpen}>
           <PopoverTrigger asChild>
             <Button
