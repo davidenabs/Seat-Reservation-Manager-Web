@@ -249,28 +249,48 @@ const EventAndDateSelector = ({
 
         {/* If the event hall is paid, should the price be shown */}
         {activeHall?.isPaymentEnabled && (activeHall.paymentPriceNGN || activeHall.paymentPriceUSD) && (
-          <div className="bg-gray-50 border border-gray-200 rounded-2xl py-2 px-3 w-full flex items-start gap-3">
-            <div className="text-gray-600 mt-0.5">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></svg>
-            </div>
-            <div>
-              <p className="text-gray-800 text-sm font-medium mb-1">
-                Ticket Price (per day)
-              </p>
-              <p className="text-gray-700 text-sm font-semibold">
-                {activeHall.paymentPriceNGN ? `₦${activeHall.paymentPriceNGN.toLocaleString()}` : ''}
-                {activeHall.paymentPriceNGN && activeHall.paymentPriceUSD ? ' / ' : ''}
-                {activeHall.paymentPriceUSD ? `$${activeHall.paymentPriceUSD.toLocaleString()}` : ''}
-              </p>
-              {activeHall.isMultipleDaysBookingEnabled && activeHall.discountConfig?.minDays ? (
-                 <p className=" text-xs mt-1 font-medium px-2 py-1 rounded inline-block border">
-                   Book {activeHall.discountConfig.minDays}+ days to get 
-                   {activeHall.discountConfig.discountAmountNGN ? ` ₦${activeHall.discountConfig.discountAmountNGN.toLocaleString()}` : ''}
-                   {activeHall.discountConfig.discountAmountNGN && activeHall.discountConfig.discountAmountUSD ? ' / ' : ''}
-                   {activeHall.discountConfig.discountAmountUSD ? ` $${activeHall.discountConfig.discountAmountUSD.toLocaleString()}` : ''} off!
-                 </p>
-              ) : null}
-            </div>
+          <div className="flex flex-col gap-2 w-full">
+
+            {/* Display Total Price */}
+            {(() => {
+              const numSelected = activeHall.isMultipleDaysBookingEnabled ? selectedDates.length : (selectedDate ? 1 : 0);
+              if (numSelected > 0) {
+                let totalNGN = (activeHall.paymentPriceNGN || 0) * numSelected;
+                let totalUSD = (activeHall.paymentPriceUSD || 0) * numSelected;
+                let hasDiscount = false;
+                
+                if (activeHall.isMultipleDaysBookingEnabled && activeHall.discountConfig?.minDays && numSelected >= activeHall.discountConfig.minDays) {
+                  totalNGN -= (activeHall.discountConfig.discountAmountNGN || 0);
+                  totalUSD -= (activeHall.discountConfig.discountAmountUSD || 0);
+                  hasDiscount = true;
+                  
+                  if (totalNGN < 0) totalNGN = 0;
+                  if (totalUSD < 0) totalUSD = 0;
+                }
+                
+                return (
+                  <div className="bg-[#FD690C]/10 border border-[#FD690C]/20 rounded-2xl py-3 px-4 w-full flex justify-between items-center">
+                    <div>
+                      <p className="text-[#FD690C] text-sm font-semibold">
+                        Total Amount ({numSelected} {numSelected === 1 ? 'day' : 'days'})
+                      </p>
+                      {hasDiscount && (
+                        <p className="text-[#FD690C]/80 text-xs font-medium">Discount applied!</p>
+                      )}
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[#FD690C] text-lg font-bold">
+                        {totalNGN > 0 ? `₦${totalNGN.toLocaleString()}` : ''}
+                        {totalNGN > 0 && totalUSD > 0 ? ' / ' : ''}
+                        {totalUSD > 0 ? `$${totalUSD.toLocaleString()}` : ''}
+                        {totalNGN === 0 && totalUSD === 0 ? 'Free' : ''}
+                      </p>
+                    </div>
+                  </div>
+                );
+              }
+              return null;
+            })()}
           </div>
         )}
       </CardContent>
