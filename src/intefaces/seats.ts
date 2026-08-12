@@ -1,4 +1,4 @@
-import type { ISettings } from "./settings";
+import type { IHall } from "@/services/hallService";
 
 // Types for better type safety
 export interface ISeat {
@@ -22,5 +22,5 @@ export interface ISeatGridProps {
   error: Error | null;
   onRetry: () => void;
   seatsData: ISeatsResponse |undefined;
-  settings: ISettings | undefined;
+  settings: IHall | undefined;
 }

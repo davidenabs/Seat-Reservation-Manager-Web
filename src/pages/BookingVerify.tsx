@@ -103,6 +103,12 @@ const BookingVerify = () => {
             localStorage.removeItem("bookingEmail");
             localStorage.removeItem("reservationToken");
 
+            if ((response as any).data?.paymentLinkNGN || (response as any).data?.paymentLinkUSD) {
+              toast.success("Please select your payment currency.");
+              navigate(ROUTES.PAYMENT_OPTIONS);
+              return;
+            }
+
             // Navigate to success page
             navigate(ROUTES.BOOKING_SUCCESS);
         },

@@ -2,9 +2,10 @@ import type { IEvent } from "./event";
 import type { IUser } from "./user";
 
 export interface IReservationPayload {
-  eventDate: string;
-  seatNumbers: number[];
-  seatLabels: string[];
+  eventDate?: string;
+  eventDates?: string[];
+  seatNumbers?: number[];
+  seatLabels?: string[];
   name: string;
   email: string;
   phone: string;

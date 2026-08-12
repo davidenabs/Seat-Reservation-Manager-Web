@@ -2,7 +2,9 @@ import SeatReservationPage from "@/pages/SeatReservation";
 import BookingTicket from "@/pages/BookingTicket";
 import VerifyEmail from "@/pages/VerifyEmail";
 import BookingVerify from "@/pages/BookingVerify";
+import PaymentVerify from "@/pages/PaymentVerify";
 import CancelReservation from "@/pages/CancelReservation";
+import PaymentOptions from "@/pages/PaymentOptions";
 import Subscription from "@/pages/Subscription";
 import MemberDashboard from "@/pages/MemberDashboard";
 import WaitingRoom from "@/pages/WaitingRoom";
@@ -45,6 +47,14 @@ export const reservationRoutes: CustomRouteObject[] = [
     {
         path: ROUTES.VERIFY,
         element: <BookingVerify />,
+    },
+    {
+        path: "/payment/verify",
+        element: <PaymentVerify />,
+    },
+    {
+        path: ROUTES.PAYMENT_OPTIONS,
+        element: <PaymentOptions />,
     },
     {
         path: ROUTES.CANCEL,

@@ -25,6 +25,7 @@ import { Loader, Ticket } from "lucide-react";
 
 interface ReservationFormProps {
   selectedDate: string;
+  selectedDates?: string[];
   selectedSeats: Array<{ number: number; label: string }>;
   validDates: Array<{ value: string; label: string }>;
   hallName?: string;
@@ -34,6 +35,7 @@ interface ReservationFormProps {
 
 const ReservationForm = ({
   selectedDate,
+  selectedDates,
   selectedSeats,
   hallName,
   onSubmit,
@@ -78,7 +80,20 @@ const ReservationForm = ({
         </CardHeader>
         <CardContent className="space-y-2">
           {hallName && <p className="flex justify-between"><span>Location:</span> <span className="font-medium text-right">{hallName}</span></p>}
-          <p className="flex justify-between"><span>Date:</span> <span className="text-right">{formatSelectedDate(selectedDate)}</span></p>
+          {selectedDates && selectedDates.length > 0 ? (
+            <div className="flex justify-between items-start">
+                <span>Dates:</span> 
+                <div className="text-right flex gap-1">
+                    {selectedDates.map((date, idx) => (
+                        <span key={idx} className="text-xs font-medium">{formatSelectedDate(date)} 
+                        {idx < selectedDates.length - 1 && " | "}
+                        </span>
+                    ))}
+                </div>
+            </div>
+          ) : (
+            <p className="flex justify-between"><span>Date:</span> <span className="text-right">{formatSelectedDate(selectedDate)}</span></p>
+          )}
           <p className="flex justify-between"><span>Arrival:</span> <span className="text-right">9:00AM</span></p>
           <p className="flex justify-between"><span>Selected Seats:</span> <span className="text-right">{selectedSeats.map(s => s.label).join(', ')}</span></p>
         </CardContent>

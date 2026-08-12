@@ -13,10 +13,10 @@ const HomePage = () => {
         queryFn: () => HallService.getHalls(),
     });
 
-    const formatDateRange = (openDate?: string, closeDate?: string) => {
+    const formatDateRange = (openDate?: string | Date, closeDate?: string | Date) => {
         if (!openDate || !closeDate) return "Dates TBD";
-        const start = new Date(openDate);
-        const end = new Date(closeDate);
+        const start = openDate instanceof Date ? openDate : new Date(openDate);
+        const end = closeDate instanceof Date ? closeDate : new Date(closeDate);
 
         const startMonth = format(start, "MMMM");
         const endMonth = format(end, "MMMM");
@@ -64,9 +64,18 @@ const HomePage = () => {
                                         )}
                                     </div>
                                     <h3 className="text-2xl font-bold font-serif mb-2">{hall.name}</h3>
-                                    <p className="text-gray-600 mb-6">
+                                    <p className="text-gray-600 mb-2">
                                         {formatDateRange(hall.reservationOpenDate, hall.reservationCloseDate)}
                                     </p>
+                                    {hall.isPaymentEnabled ? (
+                                        <p className="text-gray-900 font-semibold mb-6">
+                                            Cost: ₦{hall.paymentPriceNGN?.toLocaleString() || "0"}
+                                        </p>
+                                    ) : (
+                                        <p className="text-emerald-600 font-semibold mb-6">
+                                            Free Registration
+                                        </p>
+                                    )}
                                     <div>
                                         <Button
                                             onClick={() => navigate(`/reserve?hallId=${hall._id}`)}

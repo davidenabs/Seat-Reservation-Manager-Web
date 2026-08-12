@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/popover";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { cn } from "@/lib/utils";
-import type { ISettings } from "@/intefaces/settings";
 import {
   Select,
   SelectContent,
@@ -17,15 +16,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { IHall } from "@/services/hallService";
 
-interface DateSelectorProps {
+interface EventAndDateSelectorProps {
   selectedDate: string;
   onDateChange: (date: string) => void;
+  selectedDates?: string[];
+  onDatesChange?: (dates: string[]) => void;
   isLoading: boolean;
   error: Error | null;
   onRetry: () => void;
-  settings: ISettings | null;
-  halls: any[];
+  halls: IHall[];
   selectedHallId: string;
   onHallChange: (id: string) => void;
 }
@@ -42,27 +43,30 @@ const formatSelectedDate = (dateString: string) => {
   });
 };
 
-const DateSelector = ({
+const EventAndDateSelector = ({
   selectedDate,
   onDateChange,
+  selectedDates = [],
+  onDatesChange,
   isLoading,
   error,
   // onRetry,
-  settings,
   halls,
   selectedHallId,
   onHallChange,
-}: DateSelectorProps) => {
+}: EventAndDateSelectorProps) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  const activeHall = useMemo(() => halls?.find((hall) => hall._id === selectedHallId), [halls, selectedHallId]);
 
   // Setup reservation allowed date range from settings
   const minDate =
-    settings?.reservationOpenDate !== undefined
-      ? new Date(settings.reservationOpenDate)
+    activeHall?.reservationOpenDate !== undefined
+      ? new Date(activeHall.reservationOpenDate)
       : null;
   const maxDate =
-    settings?.reservationCloseDate !== undefined
-      ? new Date(settings.reservationCloseDate)
+    activeHall?.reservationCloseDate !== undefined
+      ? new Date(activeHall.reservationCloseDate)
       : null;
 
   // Normalize time for min/max
@@ -70,8 +74,8 @@ const DateSelector = ({
   if (maxDate) maxDate.setHours(23, 59, 59, 999);
 
   // Get array of working days from settings (e.g. [1, 2, 3, 4, 5] for Mon-Fri)
-  const workingDays: number[] = Array.isArray(settings?.workingDays)
-    ? settings.workingDays.map(Number)
+  const workingDays: number[] = Array.isArray(activeHall?.workingDays)
+    ? activeHall.workingDays.map(Number)
     : [];
 
   // Convert selected date string to Date object for calendar
@@ -98,7 +102,7 @@ const DateSelector = ({
     if (!workingDays.includes(dayOfWeek)) return true;
 
     // 4. Manually disable January 22, 2026
-    const blockedDates = settings?.blockedDates || [];
+    const blockedDates = activeHall?.blockedDates || [];
     // console.log({blockedDates});
 
     const manuallyDisabledDates = blockedDates.map((d) => {
@@ -133,7 +137,7 @@ const DateSelector = ({
       }
     }
     return minDate || today;
-  }, [minDate, maxDate, workingDays, settings, selectedDate]); // dependencies: all affecting enablement
+  }, [minDate, maxDate, workingDays, activeHall, selectedDate]); // dependencies: all affecting enablement
 
   // Compute initialFocus date for the calendar
   // If there's a selected date, focus that.
@@ -146,10 +150,16 @@ const DateSelector = ({
         : undefined;
 
   // Handle calendar selection
+  const isMultiple = activeHall?.isMultipleDaysBookingEnabled;
   const handleDateSelect = (date: Date | undefined) => {
-    if (date) {
+    if (!isMultiple && date) {
       onDateChange(date.toISOString());
       setIsOpen(false);
+    }
+  };
+  const handleDatesSelect = (dates: Date[] | undefined) => {
+    if (isMultiple && onDatesChange) {
+      onDatesChange(dates?.map(d => d.toISOString()) || []);
     }
   };
 
@@ -166,7 +176,7 @@ const DateSelector = ({
             value={selectedHallId}
             onValueChange={(val) => {
               onHallChange(val)
-             
+
             }}
           >
             <SelectTrigger className="w-full h-[48px]">
@@ -174,7 +184,7 @@ const DateSelector = ({
             </SelectTrigger>
             <SelectContent>
               {halls.map((hall) => (
-                <SelectItem key={hall._id} value={hall._id}>
+                <SelectItem key={hall._id} value={hall._id!}>
                   {hall.name} - {hall.city}, {hall.state}
                 </SelectItem>
               ))}
@@ -199,6 +209,8 @@ const DateSelector = ({
                 <span className="flex-1 truncate">
                   {isLoading ? (
                     <span className="text-gray-400">Loading…</span>
+                  ) : isMultiple ? (
+                    selectedDates.length > 0 ? `${selectedDates.length} days selected` : <span className="text-muted-foreground">Select dates</span>
                   ) : selectedDate ? (
                     formatSelectedDate(selectedDate)
                   ) : (
@@ -212,20 +224,58 @@ const DateSelector = ({
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
-            <CalendarComponent
-              mode="single"
-              selected={selectedDateObj}
-              onSelect={handleDateSelect}
-              disabled={isDateDisabled}
-              initialFocus
-              // defaultMonth goes to either selected or (first enabled date's month)
-              defaultMonth={initialFocusDate}
-            />
+            {isMultiple ? (
+              <CalendarComponent
+                mode="multiple"
+                selected={selectedDates.map(d => new Date(d))}
+                onSelect={handleDatesSelect}
+                disabled={isDateDisabled}
+                initialFocus
+                defaultMonth={initialFocusDate}
+              />
+            ) : (
+              <CalendarComponent
+                mode="single"
+                selected={selectedDateObj}
+                onSelect={handleDateSelect}
+                disabled={isDateDisabled}
+                initialFocus
+                defaultMonth={initialFocusDate}
+              />
+            )}
           </PopoverContent>
         </Popover>
+
+
+        {/* If the event hall is paid, should the price be shown */}
+        {activeHall?.isPaymentEnabled && (activeHall.paymentPriceNGN || activeHall.paymentPriceUSD) && (
+          <div className="bg-gray-50 border border-gray-200 rounded-2xl py-2 px-3 w-full flex items-start gap-3">
+            <div className="text-gray-600 mt-0.5">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></svg>
+            </div>
+            <div>
+              <p className="text-gray-800 text-sm font-medium mb-1">
+                Ticket Price (per day)
+              </p>
+              <p className="text-gray-700 text-sm font-semibold">
+                {activeHall.paymentPriceNGN ? `₦${activeHall.paymentPriceNGN.toLocaleString()}` : ''}
+                {activeHall.paymentPriceNGN && activeHall.paymentPriceUSD ? ' / ' : ''}
+                {activeHall.paymentPriceUSD ? `$${activeHall.paymentPriceUSD.toLocaleString()}` : ''}
+              </p>
+              {activeHall.isMultipleDaysBookingEnabled && activeHall.discountConfig?.minDays ? (
+                 <p className=" text-xs mt-1 font-medium px-2 py-1 rounded inline-block border">
+                   Book {activeHall.discountConfig.minDays}+ days to get 
+                   {activeHall.discountConfig.discountAmountNGN ? ` ₦${activeHall.discountConfig.discountAmountNGN.toLocaleString()}` : ''}
+                   {activeHall.discountConfig.discountAmountNGN && activeHall.discountConfig.discountAmountUSD ? ' / ' : ''}
+                   {activeHall.discountConfig.discountAmountUSD ? ` $${activeHall.discountConfig.discountAmountUSD.toLocaleString()}` : ''} off!
+                 </p>
+              ) : null}
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
 };
 
-export default DateSelector;
+export default EventAndDateSelector;

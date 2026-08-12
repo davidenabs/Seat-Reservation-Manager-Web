@@ -16,4 +16,5 @@ export const ROUTES = {
     TRANSACTIONS: "/transactions",
     PROFILE: "/profile",
     RESOURCES: "/resources",
+    PAYMENT_OPTIONS: "/payment/options",
 }
