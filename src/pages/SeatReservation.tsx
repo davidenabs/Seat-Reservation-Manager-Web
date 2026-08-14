@@ -9,6 +9,7 @@ import EventAndDateSelector from "@/components/EventAndDateSelector";
 import MultiDaySelection from "@/components/reservation/MultiDaySelection";
 import SingleDaySeatSelection from "@/components/reservation/SingleDaySeatSelection";
 import { useSeatReservation } from "@/hooks/useSeatReservation";
+import EditBookingOTPModal from "@/components/reservation/EditBookingOTPModal";
 
 const SeatReservationPage = () => {
   const {
@@ -31,15 +32,43 @@ const SeatReservationPage = () => {
     isLoadingHalls,
     multipleSeatsQueries,
     reservationMutation,
+    editMutation,
     handleSeatClick,
     handleReserveSeat,
     handleFormSubmit,
     navigate,
+    editEmail,
+    setEditEmail
   } = useSeatReservation();
+
+  const handleEditVerified = (email: string, bookings: any[]) => {
+    setEditEmail(email);
+    if (bookings.length > 0) {
+      const hallId = bookings[0].hall?._id || bookings[0].hall;
+      setSelectedHallId(hallId);
+      
+      const dates = bookings.map(b => b.eventDate.split('T')[0]);
+      setSelectedDates(dates);
+      if (dates.length > 0) setSelectedDate(dates[0]);
+
+      // Handle single-day seat pre-selection
+      if (bookings[0].seatLabels && bookings[0].seatNumbers) {
+        const preselectedSeats = bookings[0].seatLabels.map((label: string, idx: number) => ({
+          label,
+          number: bookings[0].seatNumbers[idx],
+          status: 'selected'
+        }));
+        setSelectedSeats(preselectedSeats);
+      }
+      setSelectedDates(dates);
+      if (dates.length > 0) setSelectedDate(dates[0]);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-morayo-bg text-morayo-ink antialiased font-sans text-[14px] leading-[1.5] pt-[60px]">
       <VirtualNavbar />
+      <EditBookingOTPModal onVerified={handleEditVerified} />
 
       <div className="max-w-7xl mx-auto p-8">
         <Button
@@ -57,6 +86,13 @@ const SeatReservationPage = () => {
           Go back
         </Button>
 
+        {editEmail && (
+          <div className="mb-4 p-4 bg-black-50 border border-black-200 rounded-lg">
+            <p className="text-black-800 font-medium">Edit Mode Active ({editEmail})</p>
+            <p className="text-sm text-black-600">You can add or remove dates from your booking. Once finished, click Continue to confirm changes and regenerate your payment link.</p>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left Column */}
           <div className="space-y-6">
@@ -73,7 +109,9 @@ const SeatReservationPage = () => {
                     onRetry={() => { }}
                     halls={halls!}
                     selectedHallId={selectedHallId}
+                    isEditMode={!!editEmail}
                     onHallChange={(val) => {
+                      if (editEmail) return; // Prevent changing hall in edit mode
                       setSelectedHallId(val);
                       setSelectedDate("");
                       setSelectedDates([]);
@@ -91,7 +129,8 @@ const SeatReservationPage = () => {
                           setSelectedDates={setSelectedDates}
                           multipleSeatsQueries={multipleSeatsQueries}
                           activeHall={activeHall}
-                          onContinue={() => setCurrentStep(2)}
+                          onContinue={handleReserveSeat}
+                          isContinuing={editMutation.isPending}
                         />
                       ) : (
                         <SingleDaySeatSelection
@@ -111,7 +150,7 @@ const SeatReservationPage = () => {
               </>
             )}
 
-            {currentStep === 2 && (
+            {currentStep === 2 && !editEmail && (
               <ReservationForm
                 selectedDate={selectedDate}
                 selectedDates={activeHall?.isMultipleDaysBookingEnabled ? selectedDates : undefined}

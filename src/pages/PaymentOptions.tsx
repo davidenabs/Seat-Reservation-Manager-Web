@@ -1,31 +1,56 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Wallet } from "lucide-react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { Wallet, Edit2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/config/route";
 import VirtualNavbar from "@/components/VirtualNavbar";
+import api from "@/lib/api-client";
 
 export default function PaymentOptions() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const ref = searchParams.get("ref");
 
   const [paymentLinkNGN, setPaymentLinkNGN] = useState<string | null>(null);
   const [paymentLinkUSD, setPaymentLinkUSD] = useState<string | null>(null);
   const [priceNGN, setPriceNGN] = useState<number | null>(null);
   const [priceUSD, setPriceUSD] = useState<number | null>(null);
+  const [expiryDays, setExpiryDays] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Read booking details from storage
+    if (ref) {
+      setIsLoading(true);
+      api.get(`/payments/details/${ref}`)
+        .then(data => {
+          if (data.success && data.data) {
+            setPaymentLinkNGN(data.data.paymentLinkNGN);
+            setPaymentLinkUSD(data.data.paymentLinkUSD);
+            setPriceNGN(data.data.priceNGN);
+            setPriceUSD(data.data.priceUSD);
+            if (data.data.bookings && data.data.bookings.length > 0 && data.data.bookings[0].paymentExpiresAt) {
+              const expiresAt = new Date(data.data.bookings[0].paymentExpiresAt);
+              const diffMs = expiresAt.getTime() - Date.now();
+              if (diffMs > 24 * 60 * 60 * 1000) {
+                 setExpiryDays(Math.ceil(diffMs / (24 * 60 * 60 * 1000)));
+              }
+            }
+          } else {
+            navigate(ROUTES.HOME);
+          }
+        })
+        .catch(() => navigate(ROUTES.HOME))
+        .finally(() => setIsLoading(false));
+      return;
+    }
+
+    // Read booking details from storage (fallback)
     const bookingDetailsStr = localStorage.getItem("booking_details") || sessionStorage.getItem("booking_details");
 
     if (bookingDetailsStr) {
       try {
         const details = JSON.parse(bookingDetailsStr);
-        // console.log({
-        //   details, paymentLinkNGN,
-        //   paymentLinkUSD
-        // });
-
         const ngnLink = details?.data?.paymentLinkNGN || details?.paymentLinkNGN;
         const usdLink = details?.data?.paymentLinkUSD || details?.paymentLinkUSD;
         const pNGN = details?.priceNGN;
@@ -36,7 +61,6 @@ export default function PaymentOptions() {
         if (pNGN) setPriceNGN(pNGN);
         if (pUSD) setPriceUSD(pUSD);
 
-        // If neither exists, go to success page
         if (!ngnLink && !usdLink) {
           navigate(ROUTES.BOOKING_SUCCESS);
         }
@@ -46,9 +70,12 @@ export default function PaymentOptions() {
     } else {
       navigate(ROUTES.HOME);
     }
-  }, [navigate]);
+  }, [navigate, ref]);
 
-  // If no links at all, render nothing while redirecting
+  if (isLoading) {
+    return <div className="min-h-screen bg-morayo-bg flex items-center justify-center">Loading payment details...</div>;
+  }
+
   if (!paymentLinkNGN && !paymentLinkUSD) {
     return null; 
   }
@@ -65,7 +92,7 @@ export default function PaymentOptions() {
 
           <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-8 w-full">
             <p className="text-red-600 text-sm font-medium">
-              Action Required: If payment is not completed within 30 minutes, your reservation will expire and the seats will be released.
+              {expiryDays ? `Action Required: If payment is not completed within ${expiryDays} days, your early bird offer will expire and the seats will be released.` : "Action Required: If payment is not completed within 30 minutes, your reservation will expire and the seats will be released."}
             </p>
           </div>
 
@@ -91,6 +118,16 @@ export default function PaymentOptions() {
                 Pay in USD {priceUSD ? priceUSD.toLocaleString() : ''}
               </Button>
             )}
+
+            <Button
+              variant="outline"
+              onClick={() => navigate(`${ROUTES.RESERVE}?edit=true`)}
+              className="w-full h-[48px] rounded-full border-2 border-gray-300 text-gray-700 hover:bg-gray-50 mt-4"
+              size="lg"
+            >
+              <Edit2 className="w-5 h-5 mr-2" />
+              Modify Booking Dates
+            </Button>
           </div>
 
           <p className="text-sm text-gray-500 mt-6">

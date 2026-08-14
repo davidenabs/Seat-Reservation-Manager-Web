@@ -29,6 +29,7 @@ interface EventAndDateSelectorProps {
   halls: IHall[];
   selectedHallId: string;
   onHallChange: (id: string) => void;
+  isEditMode?: boolean;
 }
 
 // Helper: format date for display
@@ -54,6 +55,7 @@ const EventAndDateSelector = ({
   halls,
   selectedHallId,
   onHallChange,
+  isEditMode,
 }: EventAndDateSelectorProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -255,8 +257,16 @@ const EventAndDateSelector = ({
             {(() => {
               const numSelected = activeHall.isMultipleDaysBookingEnabled ? selectedDates.length : (selectedDate ? 1 : 0);
               if (numSelected > 0) {
-                let totalNGN = (activeHall.paymentPriceNGN || 0) * numSelected;
-                let totalUSD = (activeHall.paymentPriceUSD || 0) * numSelected;
+                let baseNgn = activeHall.paymentPriceNGN || 0;
+                let baseUsd = activeHall.paymentPriceUSD || 0;
+                
+                if (isEditMode && activeHall.discountConfig?.existingUserPriceNGN !== undefined) {
+                  baseNgn = activeHall.discountConfig.existingUserPriceNGN;
+                  baseUsd = activeHall.discountConfig.existingUserPriceUSD || 0;
+                }
+                
+                let totalNGN = baseNgn * numSelected;
+                let totalUSD = baseUsd * numSelected;
                 let hasDiscount = false;
                 
                 if (activeHall.isMultipleDaysBookingEnabled && activeHall.discountConfig?.minDays && numSelected >= activeHall.discountConfig.minDays) {

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useQuery, useQueries, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueries, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { BookingService } from "@/services/bookingService";
@@ -8,6 +8,7 @@ import { ROUTES } from "@/config/route";
 import type { IReservationPayload } from "@/intefaces/reservation";
 import type { ISeat } from "@/intefaces/seats";
 import type { ReservationFormData } from "@/schemas/reservationSchema";
+import api from "@/lib/api-client";
 
 export const useSeatReservation = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -18,7 +19,8 @@ export const useSeatReservation = () => {
   const initialHallId = searchParams.get("hallId") || "";
   const [selectedHallId, setSelectedHallId] = useState<string>(initialHallId);
 
-  const queryClient = useQueryClient();
+  const [editEmail, setEditEmail] = useState<string | null>(null);
+
   const navigate = useNavigate();
 
   const { data: seatsResponse, isLoading: isLoadingSeats, error: seatsError, refetch: refetchSeats } = useQuery({
@@ -51,51 +53,53 @@ export const useSeatReservation = () => {
   }, [halls, selectedHallId]);
 
   const multipleSeatsQueries = useQueries({
-    queries: selectedDates.map(date => {
+    queries: selectedDates.map((date) => {
+      const localDate = new Date(date);
+      localDate.setMinutes(localDate.getMinutes() - localDate.getTimezoneOffset());
+      const formattedDate = localDate.toISOString().split("T")[0];
       return {
-        queryKey: ["seats", date, selectedHallId],
-        queryFn: () => {
-          const localDate = new Date(date);
-          localDate.setMinutes(localDate.getMinutes() - localDate.getTimezoneOffset());
-          const formattedDate = localDate.toISOString().split("T")[0];
-          return BookingService.fetchAvailableSeats(formattedDate, selectedHallId);
-        },
-        enabled: activeHall?.isMultipleDaysBookingEnabled && !!date && !!selectedHallId,
+        queryKey: ["seats", formattedDate, selectedHallId],
+        queryFn: () => BookingService.fetchAvailableSeats(formattedDate, selectedHallId),
+        enabled: !!date && !!selectedHallId,
         staleTime: 30000,
         gcTime: 300000,
+      };
+    }),
+  });
+
+  const editMutation = useMutation({
+    mutationFn: async (payload: { email: string; hallId: string; newEventDates: string[] }) => {
+      const res = await api.post("/bookings/modify-unpaid", payload);
+      return res;
+    },
+    onSuccess: (data) => {
+      if (data.success && data.data?.baseRef) {
+        navigate(`${ROUTES.PAYMENT_OPTIONS}?ref=${data.data.baseRef}`);
+      } else {
+        toast.success(data.message || "Bookings updated");
+        navigate(ROUTES.HOME);
       }
-    })
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || "Failed to update bookings");
+    }
   });
 
   const reservationMutation = useMutation({
     mutationFn: (payload: IReservationPayload) => BookingService.reserveSeat(payload),
-    onSuccess: (data) => {
-      const tempId = data.tempId;
-      const reservationToken = data.reservationToken;
-
-      if (tempId) {
-        localStorage.setItem("reservationToken", reservationToken!);
-        toast.success("Please check your email for verification code.");
-        navigate(`/verify/${tempId}`);
-      } else {
-        queryClient.invalidateQueries({ queryKey: ["seats"] });
-
-        if ((data as any).data?.paymentLinkNGN || (data as any).data?.paymentLinkUSD) {
-          toast.success("Reservation saved! Please select your payment currency.");
-          
-          const numSelected = activeHall?.isMultipleDaysBookingEnabled ? selectedDates.length : (selectedDate ? 1 : 0);
-          let totalNGN = (activeHall?.paymentPriceNGN || 0) * numSelected;
-          let totalUSD = (activeHall?.paymentPriceUSD || 0) * numSelected;
-
-          if (activeHall?.isMultipleDaysBookingEnabled && activeHall?.discountConfig?.minDays && numSelected >= activeHall.discountConfig.minDays) {
-            totalNGN -= (activeHall.discountConfig.discountAmountNGN || 0);
-            totalUSD -= (activeHall.discountConfig.discountAmountUSD || 0);
-            if (totalNGN < 0) totalNGN = 0;
-            if (totalUSD < 0) totalUSD = 0;
-          }
+    onSuccess: (data: any) => {
+      if (data.success) {
+        if (data.data?.requiresPayment || data.data?.paymentLinkNGN) {
+          const totalNGN = activeHall?.isMultipleDaysBookingEnabled 
+            ? (activeHall.paymentPriceNGN || 0) * selectedDates.length
+            : (activeHall?.paymentPriceNGN || 0) * selectedSeats.length;
+            
+          const totalUSD = activeHall?.isMultipleDaysBookingEnabled 
+            ? (activeHall.paymentPriceUSD || 0) * selectedDates.length
+            : (activeHall?.paymentPriceUSD || 0) * selectedSeats.length;
 
           const bookingDataWithPrices = {
-            ...data,
+            ...data.data,
             priceNGN: totalNGN,
             priceUSD: totalUSD
           };
@@ -119,8 +123,11 @@ export const useSeatReservation = () => {
   });
 
   useEffect(() => {
-    setSelectedSeats([]);
-  }, [selectedDate]);
+    // Only wipe seats if we are not in edit mode
+    if (!editEmail) {
+      setSelectedSeats([]);
+    }
+  }, [selectedDate, editEmail]);
 
   const handleSeatClick = (seat: ISeat) => {
     if (!seat.isAvailable) return;
@@ -129,11 +136,31 @@ export const useSeatReservation = () => {
       setSelectedSeats(selectedSeats.filter((s: ISeat) => s.number !== seat.number));
     } else if (selectedSeats.length < (activeHall?.maxSeatsPerUser ?? 2)) {
       setSelectedSeats([...selectedSeats, seat]);
+    } else {
+      toast.error(`You can only select up to ${activeHall?.maxSeatsPerUser} seats.`);
     }
   };
 
   const handleReserveSeat = () => {
-    if (selectedSeats.length === 0) return;
+    if (editEmail) {
+      // In edit mode, submit modification directly
+      editMutation.mutate({
+        email: editEmail,
+        hallId: selectedHallId,
+        newEventDates: (activeHall?.isMultipleDaysBookingEnabled ? selectedDates : (selectedDate ? [selectedDate] : [])).map(d => {
+          const local = new Date(d);
+          local.setMinutes(local.getMinutes() - local.getTimezoneOffset());
+          return local.toISOString();
+        })
+      });
+      return;
+    }
+    
+    if (activeHall?.isMultipleDaysBookingEnabled) {
+      if (selectedDates.length === 0) return;
+    } else {
+      if (selectedSeats.length === 0) return;
+    }
     setCurrentStep(2);
   };
 
@@ -158,8 +185,7 @@ export const useSeatReservation = () => {
       payload.seatNumbers = selectedSeats.map((s: ISeat) => s.number);
       payload.seatLabels = selectedSeats.map((s: ISeat) => s.label);
     }
-
-    localStorage.setItem("bookingEmail", formData.email);
+    
     reservationMutation.mutate(payload);
   };
 
@@ -183,9 +209,12 @@ export const useSeatReservation = () => {
     isLoadingHalls,
     multipleSeatsQueries,
     reservationMutation,
+    editMutation,
     handleSeatClick,
     handleReserveSeat,
     handleFormSubmit,
     navigate,
+    editEmail,
+    setEditEmail
   };
 };

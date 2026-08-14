@@ -10,6 +10,7 @@ interface MultiDaySelectionProps {
     multipleSeatsQueries: any[];
     activeHall: any;
     onContinue: () => void;
+    isContinuing?: boolean;
 }
 
 const MultiDaySelection = ({
@@ -17,7 +18,8 @@ const MultiDaySelection = ({
     setSelectedDates,
     multipleSeatsQueries,
     activeHall,
-    onContinue
+    onContinue,
+    isContinuing
 }: MultiDaySelectionProps) => {
     return (
         <CardContent className="pt-6">
@@ -62,9 +64,10 @@ const MultiDaySelection = ({
                 onClick={onContinue}
                 className="w-full h-[48px] rounded-full"
                 size="lg"
+                disabled={isContinuing}
             >
                 <Ticket fill="" />
-                Continue with {selectedDates.length} selected day(s)
+                {isContinuing ? "Processing..." : `Continue with ${selectedDates.length} selected day(s)`}
             </Button>
         </CardContent>
     );
