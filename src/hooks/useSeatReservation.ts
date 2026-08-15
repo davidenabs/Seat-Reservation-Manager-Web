@@ -87,9 +87,20 @@ export const useSeatReservation = () => {
 
   const reservationMutation = useMutation({
     mutationFn: (payload: IReservationPayload) => BookingService.reserveSeat(payload),
-    onSuccess: (data: any) => {
-      if (data.success) {
-        if (data.data?.requiresPayment || data.data?.paymentLinkNGN) {
+    onSuccess: (data: any, variables: IReservationPayload) => {
+      // The backend returns the unwrapped data (IReservationResponse)
+      if (data) {
+        if (data.requiresOTP) {
+          localStorage.setItem("bookingEmail", variables.email);
+          if (data.reservationToken) {
+            localStorage.setItem("reservationToken", data.reservationToken);
+          }
+          toast.success(data.message || "Please verify your email.");
+          navigate(ROUTES.VERIFY.replace(":tempId", data.tempId));
+          return;
+        }
+
+        if (data.requiresPayment || data.paymentLinkNGN) {
           const totalNGN = activeHall?.isMultipleDaysBookingEnabled 
             ? (activeHall.paymentPriceNGN || 0) * selectedDates.length
             : (activeHall?.paymentPriceNGN || 0) * selectedSeats.length;
@@ -99,7 +110,7 @@ export const useSeatReservation = () => {
             : (activeHall?.paymentPriceUSD || 0) * selectedSeats.length;
 
           const bookingDataWithPrices = {
-            ...data.data,
+            ...data,
             priceNGN: totalNGN,
             priceUSD: totalUSD
           };
