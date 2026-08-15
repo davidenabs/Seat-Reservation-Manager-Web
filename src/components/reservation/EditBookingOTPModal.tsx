@@ -138,7 +138,7 @@ export default function EditBookingOTPModal({ onVerified }: EditBookingOTPModalP
             <div className="space-y-2">
               <label className="text-sm font-medium">One-Time Password (OTP)</label>
               <div className="flex justify-center gap-2 mt-3">
-                <InputOTP maxLength={4} value={otp} onChange={setOtp} disabled={isLoading}>
+                <InputOTP maxLength={6} value={otp} onChange={setOtp} disabled={isLoading}>
                   <InputOTPGroup>
                     <InputOTPSlot index={0} />
                     <InputOTPSlot index={1} />
