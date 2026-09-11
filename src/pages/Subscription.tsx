@@ -12,6 +12,8 @@ const Subscription = () => {
   const [currency, setCurrency] = useState<'NGN' | 'USD'>('NGN');
   const [currentTier, setCurrentTier] = useState<string | null>(null);
 
+  const isPaused = true; // Set to true to show the paused state
+
   // if the url has redirect=dashboard, and  redirect to dashboard after successful payment
   // const urlParams = new URLSearchParams(window.location.search);
   // const redirect = urlParams.get('redirect');
@@ -101,26 +103,49 @@ const Subscription = () => {
           Join the live taping of The Morayo Show from anywhere in the world. Real conversations, real guests, real-time.
         </p>
 
-        <div className="flex justify-center mb-10">
-          <div className="inline-flex bg-morayo-surface border border-morayo-hairline rounded-full p-1">
-            <button
-              onClick={() => setCurrency('NGN')}
-              className={`px-6 py-2 rounded-full text-[13px] font-medium transition-all ${currency === 'NGN' ? 'bg-morayo-ink text-white shadow-md' : 'text-morayo-muted hover:text-morayo-ink'}`}
-            >
-              NGN (₦)
-            </button>
-            <button
-              onClick={() => setCurrency('USD')}
-              className={`px-6 py-2 rounded-full text-[13px] font-medium transition-all ${currency === 'USD' ? 'bg-morayo-ink text-white shadow-md' : 'text-morayo-muted hover:text-morayo-ink'}`}
-            >
-              USD ($)
-            </button>
+        {!isPaused && (
+          <div className="flex justify-center mb-10">
+            <div className="inline-flex bg-morayo-surface border border-morayo-hairline rounded-full p-1">
+              <button
+                onClick={() => setCurrency('NGN')}
+                className={`px-6 py-2 rounded-full text-[13px] font-medium transition-all ${currency === 'NGN' ? 'bg-morayo-ink text-white shadow-md' : 'text-morayo-muted hover:text-morayo-ink'}`}
+              >
+                NGN (₦)
+              </button>
+              <button
+                onClick={() => setCurrency('USD')}
+                className={`px-6 py-2 rounded-full text-[13px] font-medium transition-all ${currency === 'USD' ? 'bg-morayo-ink text-white shadow-md' : 'text-morayo-muted hover:text-morayo-ink'}`}
+              >
+                USD ($)
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       <div className="max-w-[980px] mx-auto px-4 md:px-8 pb-20">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {isPaused ? (
+          <div className="bg-morayo-surface border border-morayo-hairline rounded-[24px] p-10 md:p-16 text-center max-w-2xl mx-auto shadow-sm relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-morayo-coral to-[#E8593C]"></div>
+            <div className="w-16 h-16 bg-[#E8593C]/10 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-morayo-coral" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h2 className="font-fraunces text-3xl md:text-4xl text-morayo-ink mb-4 font-light tracking-tight">Subscriptions Paused</h2>
+            <p className="text-morayo-muted text-[16px] leading-relaxed mb-8">
+              Our virtual audience subscription service is temporarily on hold. We are preparing something special and will be reopening very soon. Thank you for your patience!
+            </p>
+            <button 
+              onClick={() => navigate('/')}
+              className="inline-flex items-center justify-center px-6 py-2.5 bg-morayo-ink text-white rounded-full text-[13px] font-medium hover:bg-opacity-90 transition-colors"
+            >
+              Return to Home
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
           {/* Weekly Plan */}
           <div
@@ -234,10 +259,12 @@ const Subscription = () => {
             </div>
           </div>
 
-        </div>
-        <div className="text-center mt-8 text-[12px] text-morayo-muted-2">
-          Pricing auto-detected by region · Secured by Paystack &amp; Stripe
-        </div>
+            </div>
+            <div className="text-center mt-8 text-[12px] text-morayo-muted-2">
+              Pricing auto-detected by region · Secured by Paystack &amp; Stripe
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
