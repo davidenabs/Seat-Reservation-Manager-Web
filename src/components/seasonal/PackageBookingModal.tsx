@@ -298,7 +298,7 @@ export const PackageBookingModal: React.FC<PackageBookingModalProps> = ({
               <div>
                 <Label className="text-xs font-medium text-gray-700">Gender *</Label>
                 <Select value={gender} onValueChange={(val: any) => setGender(val)}>
-                  <SelectTrigger className="rounded-xl border-gray-300 mt-1 focus:ring-[#E8593C]">
+                  <SelectTrigger className="rounded-xl border-gray-300 mt-1 focus:ring-[#E8593C] w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -312,7 +312,7 @@ export const PackageBookingModal: React.FC<PackageBookingModalProps> = ({
               <div>
                 <Label className="text-xs font-medium text-gray-700">Age Range *</Label>
                 <Select value={ageRange} onValueChange={(val: any) => setAgeRange(val)}>
-                  <SelectTrigger className="rounded-xl border-gray-300 mt-1 focus:ring-[#E8593C]">
+                  <SelectTrigger className="rounded-xl border-gray-300 mt-1 focus:ring-[#E8593C] w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>

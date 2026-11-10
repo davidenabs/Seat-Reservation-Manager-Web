@@ -1,105 +1,208 @@
-import { useState } from "react";
-import { Link, useNavigate, NavLink } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AuthService } from "../services/authService";
 import { Menu, X } from "lucide-react";
 
-const VirtualNavbar = () => {
+interface VirtualNavbarProps {
+  scrollToPackages?: () => void;
+}
+
+const VirtualNavbar: React.FC<VirtualNavbarProps> = ({ scrollToPackages }) => {
   const navigate = useNavigate();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const authenticated = AuthService.isAuthenticated();
 
-  const navLinks = [
-    { label: "Home", href: "/" },
-    { label: "Packages", href: "/packages" },
-    { label: "Meet Morayo", href: "https://themorayoshow.com/meet-morayo/" },
-    { label: "Join Us", href: "https://themorayoshow.com/join-us/" },
-    { label: "Contact", href: "https://themorayoshow.com/contact" },
-  ];
+  const isHome = location.pathname === "/" || location.pathname === "";
 
   const handleAuthAction = () => {
+    setIsMobileMenuOpen(false);
     if (authenticated) {
       AuthService.logout();
       navigate("/login");
     } else {
       navigate("/login");
     }
-    setIsMenuOpen(false);
   };
-  return (
-    <>
-      <div className="fixed top-0 left-0 right-0 z-[1000] backdrop-blur-[20px] border-b border-white/8 px-5 md:px-10 py-4 flex justify-between items-center">
-        <div className="">
-          <Link to="https://themorayoshow.com">
-            <img src="/tmas-logo-dark.png" alt="TMAS Logo" className="h-12 object-contain" />
-          </Link>
-        </div>
-        {/* Desktop Nav */}
-        <div className="hidden md:flex items-center gap-6">
-          <div className="flex gap-1 bg-white/10 border border-white/10 rounded-full p-[3px]">
-            {navLinks.map((link, index) => (
-              <NavLink
-                key={index}
-                to={link.href}
-                className="px-5 py-2 text-[13px] font-medium rounded-full transition-all"
-              >
-                {link.label}
-              </NavLink>
-            ))}
-          </div>
 
-          {/* Dashboards */}
+  const handleBookSeat = () => {
+    setIsMobileMenuOpen(false);
+    if (scrollToPackages) {
+      scrollToPackages();
+    } else {
+      const el = document.getElementById("packages");
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth" });
+      } else {
+        navigate("/");
+      }
+    }
+  };
+
+  return (
+    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 h-20 flex items-center justify-between">
+        {/* Logo */}
+        <Link to="/" className="flex items-center">
+          <img
+            src="/tmas-logo-dark.png"
+            alt="The Morayo Show"
+            className="h-10 md:h-11 object-contain"
+          />
+        </Link>
+
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center gap-8">
+          <Link
+            to="/"
+            className={
+              isHome
+                ? "relative text-[#E8593C] font-semibold text-sm pb-1 after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:w-4 after:h-[2px] after:bg-[#E8593C]"
+                : "text-gray-700 hover:text-gray-950 font-medium text-sm transition-colors"
+            }
+          >
+            Home
+          </Link>
+
+          <a
+            href="https://themorayoshow.com/episodes/"
+            target="_blank"
+            rel="noreferrer"
+            className="text-gray-700 hover:text-gray-950 font-medium text-sm transition-colors"
+          >
+            Episodes
+          </a>
+
+          <a
+            href="https://themorayoshow.com/meet-morayo/"
+            target="_blank"
+            rel="noreferrer"
+            className="text-gray-700 hover:text-gray-950 font-medium text-sm transition-colors"
+          >
+            About
+          </a>
+
+          <a
+            href="https://themorayoshow.com/contact/"
+            target="_blank"
+            rel="noreferrer"
+            className="text-gray-700 hover:text-gray-950 font-medium text-sm transition-colors"
+          >
+            Contact
+          </a>
+
+          {/* Member Dashboard Link (if logged in) */}
           {authenticated && (
-            <Link to="/member" className="text-[13px] font-medium transition-colors underline underline-offset-4">
+            <Link
+              to="/member"
+              className="text-gray-700 hover:text-gray-950 font-medium text-sm transition-colors"
+            >
               Dashboard
             </Link>
           )}
 
-          <button
-            onClick={handleAuthAction}
-            className="text-[13px] font-medium text- bg-[#E8593C]/10 border border-[#E8593C]/20 px-6 py-2.5 rounded-full hover:bg-[#E8593C] hover:text-white transition-all duration-300"
-          >
-            {authenticated ? "Logout" : "Login"}
-          </button>
-        </div>
+          {/* Login/Logout Button (if authenticated or needed) */}
+          {authenticated && (
+            <button
+              onClick={handleAuthAction}
+              className="text-xs font-medium text-gray-500 hover:text-gray-800 transition-colors"
+            >
+              Logout
+            </button>
+          )}
 
-        {/* Mobile Toggle */}
+          {/* Book A Seat CTA Button */}
+          <button
+            onClick={handleBookSeat}
+            className="bg-[#E8593C] hover:bg-[#D44A2D] text-white text-sm font-semibold px-6 py-2.5 rounded-full shadow-sm transition-all hover:scale-[1.02] active:scale-[0.98]"
+          >
+            Book A Seat
+          </button>
+        </nav>
+
+        {/* Mobile Menu Button */}
         <button
-          className="md:hidden text-[#C9C9C4] p-1"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="md:hidden text-gray-800 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+          aria-label="Toggle menu"
         >
-          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </div>
 
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="md:hidden fixed top-[80px] left-0 right-0 bg-white border-b border-gray-200 z-[999] p-5 flex flex-col gap-4 shadow-lg">
-          {navLinks.map((link, index) => (
-            <NavLink 
-              key={index} 
-              to={link.href} 
-              className="text-[15px] font-medium text-gray-800" 
-              onClick={() => setIsMenuOpen(false)}
-            >
-              {link.label}
-            </NavLink>
-          ))}
-          
+      {/* Mobile Dropdown Drawer */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden bg-white border-b border-gray-200 px-6 py-5 flex flex-col gap-4 shadow-lg animate-in slide-in-from-top-2">
+          <Link
+            to="/"
+            className={
+              isHome
+                ? "text-[#E8593C] font-semibold text-sm"
+                : "text-gray-700 font-medium text-sm"
+            }
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            Home
+          </Link>
+
+          <a
+            href="https://themorayoshow.com/episodes/"
+            target="_blank"
+            rel="noreferrer"
+            className="text-gray-700 font-medium text-sm"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            Episodes
+          </a>
+
+          <a
+            href="https://themorayoshow.com/meet-morayo/"
+            target="_blank"
+            rel="noreferrer"
+            className="text-gray-700 font-medium text-sm"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            About
+          </a>
+
+          <a
+            href="https://themorayoshow.com/contact/"
+            target="_blank"
+            rel="noreferrer"
+            className="text-gray-700 font-medium text-sm"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            Contact
+          </a>
+
           {authenticated && (
-            <Link to="/member" className="text-[15px] font-medium text-gray-800 underline" onClick={() => setIsMenuOpen(false)}>
+            <Link
+              to="/member"
+              className="text-gray-700 font-medium text-sm"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
               Dashboard
             </Link>
           )}
 
+          {authenticated && (
+            <button
+              onClick={handleAuthAction}
+              className="text-left text-xs font-medium text-gray-500 hover:text-gray-800"
+            >
+              Logout
+            </button>
+          )}
+
           <button
-            onClick={handleAuthAction}
-            className="text-[15px] font-medium text-white bg-[#E8593C] px-6 py-3 rounded-full mt-2 w-full text-center transition-all duration-300"
+            onClick={handleBookSeat}
+            className="bg-[#E8593C] hover:bg-[#D44A2D] text-white text-sm font-semibold py-3 rounded-full text-center mt-2 w-full transition-all"
           >
-            {authenticated ? "Logout" : "Login"}
+            Book A Seat
           </button>
         </div>
       )}
-    </>
+    </header>
   );
 };
 

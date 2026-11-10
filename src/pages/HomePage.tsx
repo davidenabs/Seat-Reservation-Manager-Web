@@ -1,16 +1,17 @@
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { HallService } from "@/services/hallService";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import VirtualNavbar from "@/components/VirtualNavbar";
 import { SeasonalLanding } from "@/components/seasonal/SeasonalLanding";
 import { Sparkles } from "lucide-react";
+import Footer from "@/components/Footer";
 
 const HomePage = () => {
     const navigate = useNavigate();
-    const [showStandard, setShowStandard] = useState(false);
+    const [searchParams, setSearchParams] = useSearchParams();
+    const eventParam = searchParams.get("e");
 
     const { data: halls, isLoading } = useQuery({
         queryKey: ["halls"],
@@ -19,13 +20,34 @@ const HomePage = () => {
 
     const seasonalHall = halls?.find((h) => h.isActive && h.seasonalConfig?.isEnabled);
 
+    // If ?e=standard or ?e=tour, show standard schedule.
+    // If ?e=festive or no param (when seasonalHall is active), show festive view.
+    const isStandard = eventParam === "standard" || eventParam === "tour";
+    const showSeasonal = !isLoading && !!seasonalHall && !isStandard;
+
+    const handleSwitchToStandard = () => {
+        setSearchParams((prev) => {
+            const next = new URLSearchParams(prev);
+            next.set("e", "standard");
+            return next;
+        });
+    };
+
+    const handleSwitchToFestive = () => {
+        setSearchParams((prev) => {
+            const next = new URLSearchParams(prev);
+            next.set("e", "festive");
+            return next;
+        });
+    };
+
     // If seasonal mode is enabled and user hasn't explicitly clicked to view standard schedule,
     // render the seasonal landing page replacing the homepage!
-    if (!isLoading && seasonalHall && !showStandard) {
+    if (showSeasonal) {
         return (
             <SeasonalLanding
                 hall={seasonalHall}
-                onSwitchToStandard={() => setShowStandard(true)}
+                onSwitchToStandard={handleSwitchToStandard}
             />
         );
     }
@@ -45,7 +67,7 @@ const HomePage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-morayo-bg text-morayo-ink antialiased font-sans text-[14px] leading-[1.5] pt-[60px]">
+        <div className="min-h-screen bg-morayo-bg text-morayo-ink antialiased font-sans text-[14px] leading-[1.5] pt60px]">
             <VirtualNavbar />
             <div className="min-h-screen bg-white text-gray-900 font-sans p-6 md:p-12 lg:p-20">
                 <div className="max-w-7xl mx-auto">
@@ -59,7 +81,7 @@ const HomePage = () => {
                                 </div>
                             </div>
                             <Button
-                                onClick={() => setShowStandard(false)}
+                                onClick={handleSwitchToFestive}
                                 className="bg-[#E8593C] hover:bg-[#e05a0b] text-white rounded-full text-xs px-5"
                             >
                                 View Festive Packages
@@ -83,7 +105,7 @@ const HomePage = () => {
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                            {halls?.map((hall) =>  !hall.seasonalConfig?.isEnabled && (
+                            {halls?.map((hall) => !hall.seasonalConfig?.isEnabled && (
                                 <div key={hall._id} className="flex flex-col group">
                                     <div className="rounded-lg overflow-hidden shadow-sm aspect-video bg-gray-100 mb-6 cursor-pointer transform transition-transform group-hover:scale-[1.02]" onClick={() => navigate(`/reserve?hallId=${hall._id}`)}>
                                         {hall.featureImage ? (
@@ -124,15 +146,16 @@ const HomePage = () => {
                         </div>
                     )}
 
-                    <footer className="mt-24 pt-8 text-sm font-semibold text-gray-900 border-t border-gray-100">
+                    <div className="mt-24 pt-8 text-sm font-semibold text-gray-900 border-t border-gray-100">
                         Sponsorship & Partnership{" "}
                         <a href="mailto:mabstudios.production@gmail.com" className="text-[#E8593C] hover:underline">
                             mabstudios.production@gmail.com
                         </a>{" "}
                         / <span className="text-[#E8593C]">08124461291</span>
-                    </footer>
+                    </div>
                 </div>
             </div>
+            <Footer />
         </div>
     );
 };

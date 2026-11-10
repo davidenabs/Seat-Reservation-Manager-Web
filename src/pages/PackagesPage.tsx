@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { HallService } from "@/services/hallService";
 import { SeasonalLanding } from "@/components/seasonal/SeasonalLanding";
 import { useNavigate } from "react-router-dom";
-import { ROUTES } from "@/config/route";
 import VirtualNavbar from "@/components/VirtualNavbar";
 import { Button } from "@/components/ui/button";
 
@@ -39,7 +38,7 @@ export default function PackagesPage() {
               There are currently no active seasonal packages available. You can explore our regular tour dates and book your seat below.
             </p>
             <Button
-              onClick={() => navigate(ROUTES.HOME)}
+              onClick={() => navigate("/?e=standard")}
               className="px-8 py-5 rounded-full bg-[#E8593C] hover:bg-[#e05a0b] text-white font-medium text-sm transition-colors"
             >
               View Tour Schedule
@@ -53,7 +52,7 @@ export default function PackagesPage() {
   return (
     <SeasonalLanding
       hall={seasonalHall}
-      onSwitchToStandard={() => navigate(ROUTES.HOME)}
+      onSwitchToStandard={() => navigate("/?e=standard")}
     />
   );
 }
