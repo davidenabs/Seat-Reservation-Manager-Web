@@ -18,6 +18,25 @@ const TicketSessionSummary = ({ details }: TicketSessionSummaryProps) => {
         <div className="px-6 py-8 border rounded-xl">
             <h2 className="text-xl font-bold text-gray-800 mb-6">Session Summary</h2>
 
+            {details?.packageDetails && (
+                <div className="bg-[#FFF6F3] border border-[#F1D9D2] rounded-lg p-3.5 mb-4">
+                    <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold uppercase tracking-wider text-[#CF452B]">
+                            {details.packageDetails.packageName || "Seasonal"} Package
+                        </span>
+                        <span className="text-xs font-semibold text-gray-700">
+                            {details.packageDetails.seatCount} Seats Reserved
+                        </span>
+                    </div>
+                    {details.packageDetails.attendees && details.packageDetails.attendees.length > 0 && (
+                        <div className="mt-2 pt-2 border-t border-[#F1D9D2] text-xs text-gray-600">
+                            <span className="font-medium">Registered Guests: </span>
+                            {details.packageDetails.attendees.map((a: any) => a.name).join(", ")}
+                        </div>
+                    )}
+                </div>
+            )}
+
             <div className="space-y-4">
                 {/* For multiple bookings, show a summary of dates and seats */}
                 {(() => {

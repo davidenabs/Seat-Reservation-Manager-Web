@@ -18,6 +18,29 @@ import apiClient from '../lib/api-client';
 //   minCancellationHours: number;
 //   prioritySystemEnabled: boolean;
 // }
+export interface IEventPackage {
+    id: string;
+    name: string;
+    tag?: string;
+    description: string;
+    priceNGN: number;
+    priceUSD?: number;
+    seatCount: number;
+    allocationStrategy: 'single' | 'adjacent_pair' | 'contiguous_block';
+    features: string[];
+    buttonText?: string;
+    isActive: boolean;
+}
+
+export interface ISeasonalCampaignConfig {
+    isEnabled: boolean;
+    campaignTitle: string;
+    campaignSubtitle: string;
+    themeKey?: string;
+    heroImageUrl?: string;
+    packages: IEventPackage[];
+}
+
 export interface IHall {
     _id?: string;
     name: string;
@@ -66,6 +89,8 @@ export interface IHall {
         existingUserPriceNGN: number;
         existingUserPriceUSD: number;
     };
+    
+    seasonalConfig?: ISeasonalCampaignConfig;
     
     createdAt?: Date;
     updatedAt?: Date;

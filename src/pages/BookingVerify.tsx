@@ -163,6 +163,9 @@ const BookingVerify = () => {
         };
 
         resendOTPMutation.mutate(payload);
+
+        // clear otp field
+        form.reset();
     };
 
     // Mask email for display

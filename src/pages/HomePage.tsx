@@ -1,17 +1,34 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { HallService } from "@/services/hallService";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import VirtualNavbar from "@/components/VirtualNavbar";
+import { SeasonalLanding } from "@/components/seasonal/SeasonalLanding";
+import { Sparkles } from "lucide-react";
 
 const HomePage = () => {
     const navigate = useNavigate();
+    const [showStandard, setShowStandard] = useState(false);
 
     const { data: halls, isLoading } = useQuery({
         queryKey: ["halls"],
         queryFn: () => HallService.getHalls(),
     });
+
+    const seasonalHall = halls?.find((h) => h.isActive && h.seasonalConfig?.isEnabled);
+
+    // If seasonal mode is enabled and user hasn't explicitly clicked to view standard schedule,
+    // render the seasonal landing page replacing the homepage!
+    if (!isLoading && seasonalHall && !showStandard) {
+        return (
+            <SeasonalLanding
+                hall={seasonalHall}
+                onSwitchToStandard={() => setShowStandard(true)}
+            />
+        );
+    }
 
     const formatDateRange = (openDate?: string | Date, closeDate?: string | Date) => {
         if (!openDate || !closeDate) return "Dates TBD";
@@ -32,6 +49,24 @@ const HomePage = () => {
             <VirtualNavbar />
             <div className="min-h-screen bg-white text-gray-900 font-sans p-6 md:p-12 lg:p-20">
                 <div className="max-w-7xl mx-auto">
+                    {seasonalHall && (
+                        <div className="mb-8 p-4 bg-[#FFF4F0] border border-[#FCD8CF] rounded-2xl flex items-center justify-between gap-4 flex-wrap">
+                            <div className="flex items-center gap-3">
+                                <Sparkles className="w-5 h-5 text-[#E8593C]" />
+                                <div>
+                                    <span className="font-semibold text-gray-900">Festive Season Packages are Live!</span>
+                                    <p className="text-xs text-gray-600">Special packages for Individuals, Couples, and Companies with VIP perks.</p>
+                                </div>
+                            </div>
+                            <Button
+                                onClick={() => setShowStandard(false)}
+                                className="bg-[#E8593C] hover:bg-[#e05a0b] text-white rounded-full text-xs px-5"
+                            >
+                                View Festive Packages
+                            </Button>
+                        </div>
+                    )}
+
                     <header className="mb-12">
                         <h1 className="text-4xl md:text-5xl font-serif font-bold text-black mb-4">
                             The Morayo Show Tour
@@ -48,7 +83,7 @@ const HomePage = () => {
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                            {halls?.map((hall) => (
+                            {halls?.map((hall) =>  !hall.seasonalConfig?.isEnabled && (
                                 <div key={hall._id} className="flex flex-col group">
                                     <div className="rounded-lg overflow-hidden shadow-sm aspect-video bg-gray-100 mb-6 cursor-pointer transform transition-transform group-hover:scale-[1.02]" onClick={() => navigate(`/reserve?hallId=${hall._id}`)}>
                                         {hall.featureImage ? (

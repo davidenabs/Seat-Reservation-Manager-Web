@@ -9,7 +9,8 @@ const VirtualNavbar = () => {
   const authenticated = AuthService.isAuthenticated();
 
   const navLinks = [
-    { label: "Home", href: "https://themorayoshow.com/" },
+    { label: "Home", href: "/" },
+    { label: "Packages", href: "/packages" },
     { label: "Meet Morayo", href: "https://themorayoshow.com/meet-morayo/" },
     { label: "Join Us", href: "https://themorayoshow.com/join-us/" },
     { label: "Contact", href: "https://themorayoshow.com/contact" },
