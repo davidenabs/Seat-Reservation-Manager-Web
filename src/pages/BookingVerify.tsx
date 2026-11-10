@@ -11,7 +11,6 @@ import { toast } from "sonner";
 import Logo from "@/assets/tmas-logo-black.png";
 import { VerificationService } from "@/services/verificationService";
 import { ROUTES } from "@/config/route";
-import VirtualNavbar from "@/components/VirtualNavbar";
 
 import {
     InputOTP,
