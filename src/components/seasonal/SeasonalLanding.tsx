@@ -44,6 +44,7 @@ export const SeasonalLanding: React.FC<SeasonalLandingProps> = ({
 
 
   const seasonalConfig = hall.seasonalConfig;
+  const hasCustomHeroImage = Boolean(hall.seasonalConfig?.heroImageUrl || hall.featureImage);
 
   // Fallback default packages matching the festive season tiers
   const defaultPackages: IEventPackage[] = [
@@ -203,44 +204,59 @@ export const SeasonalLanding: React.FC<SeasonalLandingProps> = ({
                 }}
               />
 
-              {/* Dynamic Overlay Badges (subtle gradient overlay) */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/30 pointer-events-none" />
+              {hasCustomHeroImage ? (
+                <>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/30 pointer-events-none" />
 
-              <div className="absolute top-4 left-4 flex items-center gap-2">
-                <span className="bg-black/60 backdrop-blur-md text-white text-[10px] sm:text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider border border-white/10">
-                  Live in-Studio
-                </span>
-              </div>
-
-              <div className="absolute top-12 sm:top-14 left-4 max-w-[200px]">
-                <h3 className="text-xl sm:text-2xl font-['Fraunces',_serif] font-bold text-white drop-shadow-sm leading-tight">
-                  End of the Year Special
-                </h3>
-                <div className="inline-flex items-center gap-1.5 bg-[#E8593C] text-white text-xs font-semibold px-3 py-1 rounded-full mt-2 shadow-sm">
-                  <Calendar className="w-3 h-3" />
-                  <span>{formatDateShort(hall.reservationOpenDate, hall.reservationCloseDate)}</span>
-                </div>
-              </div>
-
-              {/* Bottom Video Link Callout */}
-              <a
-                href="https://www.youtube.com/@morayoafolabibrownoffcial"
-                target="_blank"
-                rel="noreferrer"
-                className="absolute bottom-4 left-4 right-4 flex items-center gap-3 text-white group/play"
-              >
-                <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md border border-white/60 flex items-center justify-center shrink-0 group-hover/play:scale-110 group-hover/play:bg-[#E8593C] group-hover/play:border-[#E8593C] transition-all">
-                  <Play className="w-4 h-4 fill-white text-white ml-0.5" />
-                </div>
-                <div>
-                  <div className="text-xs font-bold uppercase tracking-wider text-white">
-                    Watch Full Video
+                  <div className="absolute top-4 left-4 flex items-center gap-2">
+                    <span className="bg-black/60 backdrop-blur-md text-white text-[10px] sm:text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider border border-white/10">
+                      Live in-Studio
+                    </span>
                   </div>
-                  <div className="text-[11px] text-white/80 font-mono">
-                    youtube.com/@morayoafolabibrownoffcial
+
+                  <div className="absolute top-12 sm:top-14 left-4 max-w-[200px]">
+                    <h3 className="text-xl sm:text-2xl font-['Fraunces',_serif] font-bold text-white drop-shadow-sm leading-tight">
+                      End of the Year Special
+                    </h3>
+                    <div className="inline-flex items-center gap-1.5 bg-[#E8593C] text-white text-xs font-semibold px-3 py-1 rounded-full mt-2 shadow-sm">
+                      <Calendar className="w-3 h-3" />
+                      <span>{formatDateShort(hall.reservationOpenDate, hall.reservationCloseDate)}</span>
+                    </div>
                   </div>
-                </div>
-              </a>
+
+                  <a
+                    href="https://www.youtube.com/@morayoafolabibrownoffcial"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="absolute bottom-4 left-4 right-4 flex items-center gap-3 text-white group/play"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md border border-white/60 flex items-center justify-center shrink-0 group-hover/play:scale-110 group-hover/play:bg-[#E8593C] group-hover/play:border-[#E8593C] transition-all">
+                      <Play className="w-4 h-4 fill-white text-white ml-0.5" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold uppercase tracking-wider text-white">
+                        Watch Full Video
+                      </div>
+                      <div className="text-[11px] text-white/80 font-mono">
+                        youtube.com/@morayoafolabibrownoffcial
+                      </div>
+                    </div>
+                  </a>
+                </>
+              ) : (
+                <a
+                  href="https://www.youtube.com/@TheMorayoShow"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="absolute inset-0 z-10 flex items-end p-4 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
+                  title="Watch The Morayo Show on YouTube"
+                >
+                  <span className="text-white text-xs font-semibold flex items-center gap-1.5 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20">
+                    <Play className="w-3.5 h-3.5 fill-white text-white" />
+                    Watch on YouTube
+                  </span>
+                </a>
+              )}
             </div>
           </div>
         </div>
