@@ -41,12 +41,18 @@ const SeatReservationPage = () => {
     setEditEmail
   } = useSeatReservation();
 
+  // if the hall.seasonalConfig?.isEnabled, the hall is seasonal, redirect to festive page
+  if (activeHall?.seasonalConfig?.isEnabled) {
+    navigate(`/?e=festive`);
+    return;
+  }
+
   const handleEditVerified = (email: string, bookings: any[]) => {
     setEditEmail(email);
     if (bookings.length > 0) {
       const hallId = bookings[0].hall?._id || bookings[0].hall;
       setSelectedHallId(hallId);
-      
+
       const dates = bookings.map(b => b.eventDate.split('T')[0]);
       setSelectedDates(dates);
       if (dates.length > 0) setSelectedDate(dates[0]);

@@ -101,11 +101,11 @@ export const useSeatReservation = () => {
         }
 
         if (data.requiresPayment || data.paymentLinkNGN) {
-          const totalNGN = activeHall?.isMultipleDaysBookingEnabled 
+          const totalNGN = activeHall?.isMultipleDaysBookingEnabled
             ? (activeHall.paymentPriceNGN || 0) * selectedDates.length
             : (activeHall?.paymentPriceNGN || 0) * selectedSeats.length;
-            
-          const totalUSD = activeHall?.isMultipleDaysBookingEnabled 
+
+          const totalUSD = activeHall?.isMultipleDaysBookingEnabled
             ? (activeHall.paymentPriceUSD || 0) * selectedDates.length
             : (activeHall?.paymentPriceUSD || 0) * selectedSeats.length;
 
@@ -166,7 +166,7 @@ export const useSeatReservation = () => {
       });
       return;
     }
-    
+
     if (activeHall?.isMultipleDaysBookingEnabled) {
       if (selectedDates.length === 0) return;
     } else {
@@ -176,6 +176,13 @@ export const useSeatReservation = () => {
   };
 
   const handleFormSubmit = (formData: ReservationFormData) => {
+
+    // if the hall.seasonalConfig?.isEnabled, throw error
+    if (activeHall?.seasonalConfig?.isEnabled) {
+      toast.error("Seasonal halls cannot be booked through this page");
+      return;
+    }
+
     let payload: any = {
       hallId: selectedHallId,
       ...formData,
@@ -196,7 +203,7 @@ export const useSeatReservation = () => {
       payload.seatNumbers = selectedSeats.map((s: ISeat) => s.number);
       payload.seatLabels = selectedSeats.map((s: ISeat) => s.label);
     }
-    
+
     reservationMutation.mutate(payload);
   };
 

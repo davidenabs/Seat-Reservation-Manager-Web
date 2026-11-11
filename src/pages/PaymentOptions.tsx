@@ -20,14 +20,33 @@ export default function PaymentOptions() {
   const [expiryDays, setExpiryDays] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  const resolvePaymentUrl = (url: string | null): string => {
+    if (!url) return "";
+    // If the URL accidentally points to localhost while running in production, rewrite to live API origin
+    if (window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
+      if (url.includes("localhost:") || url.includes("127.0.0.1:")) {
+        try {
+          const parsed = new URL(url);
+          const apiOrigin = import.meta.env.VITE_API_BASE_URL 
+            ? new URL(import.meta.env.VITE_API_BASE_URL).origin 
+            : "https://api-v2.themorayobrownshow.com";
+          return `${apiOrigin}${parsed.pathname}${parsed.search}`;
+        } catch {
+          return url.replace(/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?/, "https://api-v2.themorayobrownshow.com");
+        }
+      }
+    }
+    return url;
+  };
+
   useEffect(() => {
     if (ref) {
       setIsLoading(true);
       api.get(`/payments/details/${ref}`)
         .then(data => {
           if (data.success && data.data) {
-            setPaymentLinkNGN(data.data.paymentLinkNGN);
-            setPaymentLinkUSD(data.data.paymentLinkUSD);
+            setPaymentLinkNGN(resolvePaymentUrl(data.data.paymentLinkNGN));
+            setPaymentLinkUSD(resolvePaymentUrl(data.data.paymentLinkUSD));
             setPriceNGN(data.data.priceNGN);
             setPriceUSD(data.data.priceUSD);
             if (data.data.bookings && data.data.bookings.length > 0 && data.data.bookings[0].paymentExpiresAt) {
@@ -57,8 +76,8 @@ export default function PaymentOptions() {
         const pNGN = details?.priceNGN;
         const pUSD = details?.priceUSD;
 
-        if (ngnLink) setPaymentLinkNGN(ngnLink);
-        if (usdLink) setPaymentLinkUSD(usdLink);
+        if (ngnLink) setPaymentLinkNGN(resolvePaymentUrl(ngnLink));
+        if (usdLink) setPaymentLinkUSD(resolvePaymentUrl(usdLink));
         if (pNGN) setPriceNGN(pNGN);
         if (pUSD) setPriceUSD(pUSD);
 
@@ -84,7 +103,7 @@ export default function PaymentOptions() {
   return (
     <div className="">
       <VirtualNavbar />
-      <div className="min-h-creen bg-morayo-bg pt-[60px] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-morayo-bg pt-[60px] flex items-center justify-center p-4">
 
         <Card className="w-full max-w-2xl border border-gray-200 rounded-2xl shadow-none overflow-hidden">
           <CardContent className="p-8 text-center flex flex-col items-center">
@@ -102,7 +121,7 @@ export default function PaymentOptions() {
             <div className="flex flex-col gap-4 w-full">
               {paymentLinkNGN && (
                 <Button
-                  onClick={() => window.location.href = paymentLinkNGN}
+                  onClick={() => window.location.href = resolvePaymentUrl(paymentLinkNGN)}
                   className="w-full h-[48px] rounded-full bg-[#E8593C] hover:bg-[#e05a0b]"
                   size="lg"
                 >
@@ -113,7 +132,7 @@ export default function PaymentOptions() {
 
               {paymentLinkUSD && (
                 <Button
-                  onClick={() => window.location.href = paymentLinkUSD}
+                  onClick={() => window.location.href = resolvePaymentUrl(paymentLinkUSD)}
                   className="w-full h-[48px] rounded-full bg-[#2B4B8C] hover:bg-[#1d3566]"
                   size="lg"
                 >
