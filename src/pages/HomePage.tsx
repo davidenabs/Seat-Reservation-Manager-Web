@@ -41,12 +41,12 @@ const HomePage = () => {
         });
     };
 
-    const scrollToTours = () => {
-        const el = document.getElementById("tours");
-        if (el) {
-            el.scrollIntoView({ behavior: "smooth" });
-        }
-    };
+    // const scrollToTours = () => {
+    //     const el = document.getElementById("tours");
+    //     if (el) {
+    //         el.scrollIntoView({ behavior: "smooth" });
+    //     }
+    // };
 
     // If seasonal mode is enabled and user hasn't explicitly clicked to view standard schedule,
     // render the seasonal landing page replacing the homepage!
