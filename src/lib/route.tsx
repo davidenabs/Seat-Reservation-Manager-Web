@@ -21,11 +21,16 @@ import type { CustomRouteObject } from "@/types/route.type";
 import { ROUTES } from "@/config/route";
 import RouteGuard from "@/components/RouteGuard";
 import HomePage from "@/pages/HomePage";
+import PackagesPage from "@/pages/PackagesPage";
 
 export const reservationRoutes: CustomRouteObject[] = [
     {
         path: ROUTES.HOME,
         element: <HomePage />,
+    },
+    {
+        path: ROUTES.PACKAGES,
+        element: <PackagesPage />,
     },
     {
         path: ROUTES.MEMBER,

@@ -11,7 +11,6 @@ import { toast } from "sonner";
 import Logo from "@/assets/tmas-logo-black.png";
 import { VerificationService } from "@/services/verificationService";
 import { ROUTES } from "@/config/route";
-import VirtualNavbar from "@/components/VirtualNavbar";
 
 import {
     InputOTP,
@@ -163,6 +162,9 @@ const BookingVerify = () => {
         };
 
         resendOTPMutation.mutate(payload);
+
+        // clear otp field
+        form.reset();
     };
 
     // Mask email for display
@@ -183,7 +185,7 @@ const BookingVerify = () => {
 
     return (
         <div className="min-h-screen bg-morayo-bg text-morayo-ink antialiased font-sans text-[14px] leading-[1.5] pt-[60px] flex items-center justify-center p-4">
-            <VirtualNavbar />
+            {/* <VirtualNavbar /> */}
             <div className="w-full max-w-md">
                 {/* Header with Logo */}
                 <div className="text-center mb-8">
