@@ -82,6 +82,7 @@ export interface IHall {
     paymentPriceUSD?: number;
     
     isMultipleDaysBookingEnabled?: boolean;
+    maxMultipleFreeBookings?: number;
     discountConfig?: {
         minDays: number;
         discountAmountNGN: number;

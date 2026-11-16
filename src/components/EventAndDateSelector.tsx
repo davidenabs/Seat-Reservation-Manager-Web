@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { Calendar } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import {
@@ -161,6 +162,11 @@ const EventAndDateSelector = ({
   };
   const handleDatesSelect = (dates: Date[] | undefined) => {
     if (isMultiple && onDatesChange) {
+      const maxFree = !activeHall?.isPaymentEnabled ? activeHall?.maxMultipleFreeBookings : 0;
+      if (maxFree && maxFree > 0 && dates && dates.length > maxFree) {
+        toast.error(`You can select up to ${maxFree} date(s) for this free event.`);
+        return;
+      }
       onDatesChange(dates?.map(d => d.toISOString()) || []);
     }
   };
@@ -247,6 +253,15 @@ const EventAndDateSelector = ({
             )}
           </PopoverContent>
         </Popover>
+
+        {!activeHall?.isPaymentEnabled && activeHall?.isMultipleDaysBookingEnabled && activeHall?.maxMultipleFreeBookings && activeHall.maxMultipleFreeBookings > 0 ? (
+          <div className="bg-emerald-50 border border-emerald-200 rounded-2xl py-2.5 px-4 w-full flex justify-between items-center text-xs text-emerald-800">
+            <span className="font-medium">Free Multiple-Day Booking</span>
+            <span className="font-semibold">
+              {selectedDates.length} / {activeHall.maxMultipleFreeBookings} date(s)
+            </span>
+          </div>
+        ) : null}
 
 
         {/* If the event hall is paid, should the price be shown */}
