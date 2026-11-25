@@ -75,7 +75,7 @@ const HomePage = () => {
 
     return (
         <div className="min-h-screen bg-morayo-bg text-morayo-ink antialiased font-sans text-[14px] leading-[1.5] pt60px]">
-             {/* Top Announcement Bar when Festive Season is live */}
+            {/* Top Announcement Bar when Festive Season is live */}
             {seasonalHall && (
                 <div className="bg-[#FFF4F0] border-b border-[#FCD8CF] px-6 py-2.5 text-xs text-gray-800 flex items-center justify-between gap-4">
                     <div className="flex items-center gap-2">
@@ -129,15 +129,22 @@ const HomePage = () => {
                                     <p className="text-gray-600 mb-2">
                                         {formatDateRange(hall.reservationOpenDate, hall.reservationCloseDate)}
                                     </p>
-                                    {hall.isPaymentEnabled ? (
-                                        <p className="text-gray-900 font-semibold mb-6">
-                                            Cost: ₦{hall.paymentPriceNGN?.toLocaleString() || "0"}
-                                        </p>
-                                    ) : (
-                                        <p className="text-emerald-600 font-semibold mb-6">
-                                            Free Registration
-                                        </p>
-                                    )}
+                                    {hall.seasonalConfig?.isEnabled
+                                        ?
+                                        (
+                                            <p className="text-gray-900 font-semibold mb-6">
+                                                Seasonal Packages
+                                            </p>
+                                        )
+                                        : hall.isPaymentEnabled ? (
+                                            <p className="text-gray-900 font-semibold mb-6">
+                                                Cost: ₦{hall.paymentPriceNGN?.toLocaleString() || "0"}
+                                            </p>
+                                        ) : (
+                                            <p className="text-emerald-600 font-semibold mb-6">
+                                                Free Registration
+                                            </p>
+                                        )}
                                     <div>
                                         <Button
                                             onClick={() => navigate(`/reserve?hallId=${hall._id}`)}
