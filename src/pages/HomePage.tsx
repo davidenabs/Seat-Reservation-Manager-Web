@@ -110,7 +110,7 @@ const HomePage = () => {
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                            {halls?.map((hall) => !hall.seasonalConfig?.isEnabled && (
+                            {halls?.map((hall) => (
                                 <div key={hall._id} className="flex flex-col group">
                                     <div className="rounded-lg overflow-hidden shadow-sm aspect-video bg-gray-100 mb-6 cursor-pointer transform transition-transform group-hover:scale-[1.02]" onClick={() => navigate(`/reserve?hallId=${hall._id}`)}>
                                         {hall.featureImage ? (

@@ -25,7 +25,9 @@ const TicketSessionSummary = ({ details }: TicketSessionSummaryProps) => {
                             {details.packageDetails.packageName || "Seasonal"} Package
                         </span>
                         <span className="text-xs font-semibold text-gray-700">
-                            {details.packageDetails.seatCount} Seats Reserved
+                            {details?.bookings?.length > 1
+                                ? `${details.packageDetails.seatCount} ${details.packageDetails.seatCount === 1 ? "Seat" : "Seats"} / Day (${details.bookings.length} Days)`
+                                : `${details.packageDetails.seatCount} ${details.packageDetails.seatCount === 1 ? "Seat" : "Seats"} Reserved`}
                         </span>
                     </div>
                     {details.packageDetails.attendees && details.packageDetails.attendees.length > 0 && (

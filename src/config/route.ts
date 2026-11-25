@@ -18,4 +18,5 @@ export const ROUTES = {
     RESOURCES: "/resources",
     PAYMENT_OPTIONS: "/payment/options",
     PACKAGES: "/packages",
+    PACKAGE_BOOKING: "/packages/book",
 }

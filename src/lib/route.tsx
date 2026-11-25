@@ -22,6 +22,7 @@ import { ROUTES } from "@/config/route";
 import RouteGuard from "@/components/RouteGuard";
 import HomePage from "@/pages/HomePage";
 import PackagesPage from "@/pages/PackagesPage";
+import PackageBookingPage from "@/pages/PackageBookingPage";
 
 export const reservationRoutes: CustomRouteObject[] = [
     {
@@ -31,6 +32,10 @@ export const reservationRoutes: CustomRouteObject[] = [
     {
         path: ROUTES.PACKAGES,
         element: <PackagesPage />,
+    },
+    {
+        path: ROUTES.PACKAGE_BOOKING,
+        element: <PackageBookingPage />,
     },
     {
         path: ROUTES.MEMBER,

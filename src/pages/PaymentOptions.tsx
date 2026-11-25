@@ -73,8 +73,8 @@ export default function PaymentOptions() {
         const details = JSON.parse(bookingDetailsStr);
         const ngnLink = details?.data?.paymentLinkNGN || details?.paymentLinkNGN;
         const usdLink = details?.data?.paymentLinkUSD || details?.paymentLinkUSD;
-        const pNGN = details?.priceNGN;
-        const pUSD = details?.priceUSD;
+        const pNGN = details?.data?.priceNGN ?? details?.priceNGN;
+        const pUSD = details?.data?.priceUSD ?? details?.priceUSD;
 
         if (ngnLink) setPaymentLinkNGN(resolvePaymentUrl(ngnLink));
         if (usdLink) setPaymentLinkUSD(resolvePaymentUrl(usdLink));

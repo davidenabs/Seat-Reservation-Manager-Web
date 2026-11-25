@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import React from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   Check,
   Calendar,
@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import type { IHall, IEventPackage } from "@/services/hallService";
-import { PackageBookingModal } from "./PackageBookingModal";
+import { ROUTES } from "@/config/route";
 import VirtualNavbar from "../VirtualNavbar";
 import Footer from "../Footer";
 
@@ -27,8 +27,7 @@ export const SeasonalLanding: React.FC<SeasonalLandingProps> = ({
   hall,
   onSwitchToStandard,
 }) => {
-  const [selectedPackage, setSelectedPackage] = useState<IEventPackage | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
   const [, setSearchParams] = useSearchParams();
 
   const handleSwitchToStandard = () => {
@@ -105,8 +104,10 @@ export const SeasonalLanding: React.FC<SeasonalLandingProps> = ({
     : defaultPackages;
 
   const handleBookPackage = (pkg: IEventPackage) => {
-    setSelectedPackage(pkg);
-    setIsModalOpen(true);
+    const params = new URLSearchParams();
+    if (hall._id) params.set("hallId", hall._id);
+    params.set("packageId", pkg.id);
+    navigate(`${ROUTES.PACKAGE_BOOKING}?${params.toString()}`);
   };
 
   const scrollToPackages = () => {
@@ -432,13 +433,6 @@ export const SeasonalLanding: React.FC<SeasonalLandingProps> = ({
       </section>
 
       <Footer scrollToPackages={scrollToPackages} />
-      {/* Package Reservation Dialog / Modal */}
-      <PackageBookingModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        pkg={selectedPackage}
-        hall={hall}
-      />
     </div>
   );
 };

@@ -41,6 +41,12 @@ export interface ISeasonalCampaignConfig {
     packages: IEventPackage[];
 }
 
+export interface IGuestAppearance {
+    date: string | Date;
+    guestName?: string;
+    flyerImage?: string;
+}
+
 export interface IHall {
     _id?: string;
     name: string;
@@ -92,6 +98,11 @@ export interface IHall {
     };
     
     seasonalConfig?: ISeasonalCampaignConfig;
+    guestAppearances?: {
+        date: string | Date;
+        guestName?: string;
+        flyerImage?: string;
+    }[];
     
     createdAt?: Date;
     updatedAt?: Date;

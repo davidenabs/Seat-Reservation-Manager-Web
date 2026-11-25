@@ -95,14 +95,17 @@ const BookingVerify = () => {
             toast.success(response.message || "Email verified successfully!");
             console.log({ response });
 
-            // Store booking details for success page
-            sessionStorage.setItem("booking_details", JSON.stringify(response));
+            // Store booking details for payment options / success page (overwrite any stale localStorage entry)
+            const serialized = JSON.stringify(response);
+            localStorage.setItem("booking_details", serialized);
+            sessionStorage.setItem("booking_details", serialized);
 
             // Clear stored email
             localStorage.removeItem("bookingEmail");
             localStorage.removeItem("reservationToken");
 
-            if ((response as any).data?.paymentLinkNGN || (response as any).data?.paymentLinkUSD) {
+            const payloadData = (response as any)?.data || response;
+            if (payloadData?.paymentLinkNGN || payloadData?.paymentLinkUSD || payloadData?.requiresPayment) {
               toast.success("Please select your payment currency.");
               navigate(ROUTES.PAYMENT_OPTIONS);
               return;

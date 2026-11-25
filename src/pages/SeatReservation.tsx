@@ -6,6 +6,7 @@ import TheaterPreview from "@/components/TheaterPreview";
 import { Card } from "@/components/ui/card";
 import { ROUTES } from "@/config/route";
 import EventAndDateSelector from "@/components/EventAndDateSelector";
+import { GuestSpotlight } from "@/components/GuestSpotlight";
 import MultiDaySelection from "@/components/reservation/MultiDaySelection";
 import SingleDaySeatSelection from "@/components/reservation/SingleDaySeatSelection";
 import { useSeatReservation } from "@/hooks/useSeatReservation";
@@ -72,7 +73,7 @@ const SeatReservationPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-morayo-bg text-morayo-ink antialiased font-sans text-[14px] leading-[1.5] pt-[60px]">
+    <div className="min-h-screen bg-morayo-bg text-morayo-ink antialiased font-sans text-[14px] leading-[1.5]">
       <VirtualNavbar />
       <EditBookingOTPModal onVerified={handleEditVerified} />
 
@@ -125,6 +126,18 @@ const SeatReservationPage = () => {
                     }}
                   />
                 )}
+
+                <GuestSpotlight
+                  hall={activeHall}
+                  selectedDates={
+                    activeHall?.isMultipleDaysBookingEnabled
+                      ? selectedDates
+                      : selectedDate
+                        ? [selectedDate]
+                        : []
+                  }
+                  className="mb-6"
+                />
 
                 {(activeHall?.isMultipleDaysBookingEnabled ? selectedDates.length > 0 : selectedDate) && selectedHallId && (
                   <>
